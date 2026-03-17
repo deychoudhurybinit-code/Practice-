@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Real Estate | DCCV</title>
+
+<style>
+body{
+margin:0;
+font-family:Arial;
+background:#000;
+color:#fff;
+}
+
+header{
+background:#0b1f3a;
+padding:15px 40px;
+}
+
+nav{
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+nav h1{ color:#f4b400; }
+
+nav a{
+color:white;
+text-decoration:none;
+margin-left:20px;
+font-weight:bold;
+}
+
+/* GRID */
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+gap:20px;
+padding:40px;
+}
+
+.card{
+background:#111;
+border-radius:10px;
+overflow:hidden;
+box-shadow:0 8px 20px rgba(0,0,0,0.6);
+transition:0.3s;
+}
+
+.card:hover{
+transform:translateY(-5px);
+}
+
+.card img{
+width:100%;
+height:200px;
+object-fit:cover;
+}
+
+.card-content{
+padding:15px;
+}
+
+.price{
+color:#f4b400;
+font-size:20px;
+font-weight:bold;
+}
+
+button{
+background:#f4b400;
+border:none;
+padding:10px;
+margin-top:10px;
+cursor:pointer;
+width:100%;
+font-weight:bold;
+}
+
+/* FORM */
+
+.form-box{
+background:#111;
+padding:30px;
+margin:30px auto;
+max-width:500px;
+border-radius:10px;
+text-align:center;
+}
+
+input{
+width:85%;
+padding:10px;
+margin:10px;
+border:none;
+border-radius:5px;
+}
+
+.whatsapp{
+position:fixed;
+bottom:20px;
+right:20px;
+background:#25D366;
+padding:15px;
+border-radius:50%;
+color:white;
+text-decoration:none;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<nav>
+<h1>DCCV</h1>
+<div>
+<a href="index.html">Home</a>
+</div>
+</nav>
+</header>
+
+<h2 style="text-align:center; margin-top:30px;">🏘 Property Listings</h2>
+
+<div class="grid" id="propertyGrid"></div>
+
+<!-- APPOINTMENT FORM -->
+
+<div class="form-box">
+<h3>Book Appointment</h3>
+<input type="text" id="name" placeholder="Your Name">
+<input type="text" id="phone" placeholder="Phone Number">
+<input type="text" id="property" placeholder="Property Name">
+<button onclick="book()">Book Now</button>
+</div>
+
+<a class="whatsapp" href="https://wa.me/918402933354">Chat</a>
+
+<script>
+
+// PROPERTY DATA (EDIT HERE)
+const properties = [
+{
+name:"2BHK House - Silchar",
+price:"₹35,00,000",
+img:"https://images.unsplash.com/photo-1568605114967-8130f3a36994",
+desc:"Ready to move 2BHK house in prime location."
+},
+{
+name:"Residential Plot",
+price:"₹10,00,000",
+img:"https://images.unsplash.com/photo-1507089947368-19c1da9775ae",
+desc:"1200 sq ft land available for construction."
+},
+{
+name:"Commercial Building",
+price:"₹75,00,000",
+img:"https://images.unsplash.com/photo-1486406146926-c627a92ad1ab",
+desc:"Perfect for office or showroom."
+}
+];
+
+// LOAD PROPERTIES
+const grid = document.getElementById("propertyGrid");
+
+properties.forEach(p=>{
+grid.innerHTML += `
+<div class="card">
+<img src="${p.img}">
+<div class="card-content">
+<h3>${p.name}</h3>
+<p class="price">${p.price}</p>
+<p>${p.desc}</p>
+<button onclick="enquire('${p.name}')">Enquire</button>
+</div>
+</div>
+`;
+});
+
+// WHATSAPP ENQUIRY
+function enquire(name){
+window.open(`https://wa.me/918402933354?text=I am interested in ${name}`);
+}
+
+// BOOK APPOINTMENT
+function book(){
+let name=document.getElementById("name").value;
+let phone=document.getElementById("phone").value;
+let property=document.getElementById("property").value;
+
+let msg = 
+"REAL ESTATE APPOINTMENT %0A%0A"+
+"Name: "+name+"%0A"+
+"Phone: "+phone+"%0A"+
+"Property: "+property;
+
+window.open("https://wa.me/918402933354?text="+msg);
+}
+
+</script>
+
+</body>
+</html>
