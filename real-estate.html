@@ -34,7 +34,6 @@ font-weight:bold;
 }
 
 /* GRID */
-
 .grid{
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
@@ -81,7 +80,6 @@ font-weight:bold;
 }
 
 /* FORM */
-
 .form-box{
 background:#111;
 padding:30px;
@@ -91,7 +89,7 @@ border-radius:10px;
 text-align:center;
 }
 
-input{
+input, textarea{
 width:85%;
 padding:10px;
 margin:10px;
@@ -127,8 +125,17 @@ text-decoration:none;
 
 <div class="grid" id="propertyGrid"></div>
 
-<!-- APPOINTMENT FORM -->
+<!-- ADD PROPERTY -->
+<div class="form-box">
+<h3>Add Property</h3>
+<input type="text" id="pname" placeholder="Property Name">
+<input type="text" id="pprice" placeholder="Price">
+<textarea id="pdesc" placeholder="Description"></textarea>
+<input type="file" id="pimage">
+<button onclick="addProperty()">Add Property</button>
+</div>
 
+<!-- APPOINTMENT FORM -->
 <div class="form-box">
 <h3>Book Appointment</h3>
 <input type="text" id="name" placeholder="Your Name">
@@ -141,8 +148,8 @@ text-decoration:none;
 
 <script>
 
-// PROPERTY DATA (EDIT HERE)
-const properties = [
+// DEFAULT + SAVED DATA
+let properties = JSON.parse(localStorage.getItem("properties")) || [
 {
 name:"2BHK House - Silchar",
 price:"₹35,00,000",
@@ -163,8 +170,10 @@ desc:"Perfect for office or showroom."
 }
 ];
 
-// LOAD PROPERTIES
+// DISPLAY
+function displayProperties(){
 const grid = document.getElementById("propertyGrid");
+grid.innerHTML = "";
 
 properties.forEach(p=>{
 grid.innerHTML += `
@@ -179,6 +188,48 @@ grid.innerHTML += `
 </div>
 `;
 });
+}
+
+displayProperties();
+
+// ADD PROPERTY
+function addProperty(){
+let name = document.getElementById("pname").value;
+let price = document.getElementById("pprice").value;
+let desc = document.getElementById("pdesc").value;
+let file = document.getElementById("pimage").files[0];
+
+if(!name || !price || !desc || !file){
+alert("Fill all fields!");
+return;
+}
+
+let reader = new FileReader();
+
+reader.onload = function(e){
+let newProperty = {
+name:name,
+price:price,
+desc:desc,
+img:e.target.result
+};
+
+properties.push(newProperty);
+localStorage.setItem("properties", JSON.stringify(properties));
+
+displayProperties();
+
+alert("Property Added ✅");
+
+// CLEAR FORM
+document.getElementById("pname").value="";
+document.getElementById("pprice").value="";
+document.getElementById("pdesc").value="";
+document.getElementById("pimage").value="";
+}
+
+reader.readAsDataURL(file);
+}
 
 // WHATSAPP ENQUIRY
 function enquire(name){
