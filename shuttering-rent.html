@@ -1,55 +1,210 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Metal Shuttering Rental Services</title>
-    <link rel="stylesheet" href="styles.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shuttering Rental | DCCV</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:#000;
+    color:#fff;
+}
+
+/* Header */
+header{
+    background:#0b1f3a;
+    padding:15px 40px;
+}
+
+nav{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+nav h1{
+    color:#fff;
+    margin:0;
+}
+
+nav a{
+    color:#fff;
+    text-decoration:none;
+    margin-left:20px;
+    transition:0.3s;
+}
+
+nav a:hover{
+    color:#f4b400;
+}
+
+/* Hero Section */
+.hero{
+    text-align:center;
+    padding:80px 20px;
+    background:linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),
+    url('https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc');
+    background-size:cover;
+    background-position:center;
+}
+
+.hero h2{
+    font-size:40px;
+    margin-bottom:10px;
+}
+
+.hero p{
+    font-size:18px;
+    color:#ccc;
+}
+
+.highlight{
+    color:#f4b400;
+    font-weight:bold;
+}
+
+/* Services Section */
+.services{
+    padding:60px 20px;
+    text-align:center;
+}
+
+.services h2{
+    margin-bottom:30px;
+}
+
+.service-box{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:20px;
+}
+
+.card{
+    background:#111;
+    padding:20px;
+    width:280px;
+    border-radius:10px;
+    transition:0.3s;
+}
+
+.card:hover{
+    transform:translateY(-8px);
+    background:#1a1a1a;
+}
+
+.card h3{
+    color:#f4b400;
+}
+
+/* Benefits */
+.benefits{
+    background:#0b1f3a;
+    padding:50px 20px;
+    text-align:center;
+}
+
+.benefits h2{
+    margin-bottom:20px;
+}
+
+.benefits p{
+    font-size:18px;
+    max-width:700px;
+    margin:auto;
+}
+
+/* CTA */
+.cta{
+    text-align:center;
+    padding:50px 20px;
+}
+
+.cta button{
+    padding:12px 25px;
+    font-size:16px;
+    border:none;
+    background:#f4b400;
+    color:#000;
+    cursor:pointer;
+    border-radius:5px;
+    transition:0.3s;
+}
+
+.cta button:hover{
+    background:#fff;
+}
+
+/* Footer */
+footer{
+    background:#111;
+    text-align:center;
+    padding:20px;
+    font-size:14px;
+    color:#aaa;
+}
+
+</style>
 </head>
+
 <body>
-    <header>
-        <h1>Welcome to Our Metal Shuttering Rental Services</h1>
-    </header>
-    <section>
-        <h2>Pricing Table</h2>
-        <table>
-            <tr>
-                <th>Type</th>
-                <th>Price per Day</th>
-            </tr>
-            <tr>
-                <td>Standard Shuttering</td>
-                <td>$50</td>
-            </tr>
-            <tr>
-                <td>Heavy Duty Shuttering</td>
-                <td>$75</td>
-            </tr>
-            <tr>
-                <td>Custom Shuttering</td>
-                <td>$100</td>
-            </tr>
-        </table>
-    </section>
-    <section>
-        <h2>Gallery</h2>
-        <div class="gallery">
-            <img src="images/shuttering1.jpg" alt="Shuttering Material 1">
-            <img src="images/shuttering2.jpg" alt="Shuttering Material 2">
-            <img src="images/shuttering3.jpg" alt="Shuttering Material 3">
+
+<header>
+    <nav>
+        <h1>DCCV</h1>
+        <div>
+            <a href="index.html">Home</a>
+            <a href="services.html">Services</a>
+            <a href="contact.html">Contact</a>
         </div>
-    </section>
-    <footer>
-        <h2>Request a Quote</h2>
-        <form action="submit_quote.php" method="post">
-            <label for="name">Name:</label>
-            <input type="text" id="name" name="name" required>
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
-            <label for="message">Message:</label>
-            <textarea id="message" name="message" required></textarea>
-            <button type="submit">Submit</button>
-        </form>
-    </footer>
+    </nav>
+</header>
+
+<section class="hero">
+    <h2>Shuttering Rental Service</h2>
+    <p>High Quality Props & Plates for Construction Projects</p>
+    <p class="highlight">Save More Than 50% on Your Shuttering Cost!</p>
+</section>
+
+<section class="services">
+    <h2>Our Rental Materials</h2>
+    <div class="service-box">
+
+        <div class="card">
+            <h3>Shuttering Props</h3>
+            <p>Strong and adjustable steel props for slab and beam support. Durable and reliable for all construction needs.</p>
+        </div>
+
+        <div class="card">
+            <h3>Shuttering Plates</h3>
+            <p>High-quality plates for slab shuttering with smooth finish and long life usage.</p>
+        </div>
+
+    </div>
+</section>
+
+<section class="benefits">
+    <h2>Why Choose DCCV?</h2>
+    <p>
+        We provide cost-effective shuttering solutions that help builders, contractors, and engineers
+        reduce construction expenses significantly. With our rental service, you can 
+        <span class="highlight">save more than 50% on your shuttering cost</span> 
+        without compromising on quality and safety.
+    </p>
+</section>
+
+<section class="cta">
+    <h2>Book Your Materials Now</h2>
+    <p>Contact us today to get the best rental deals</p>
+    <button onclick="alert('Call or WhatsApp us to book now!')">Book Now</button>
+</section>
+
+<footer>
+    © 2026 Dey Choudhury Construction Ventures | All Rights Reserved
+</footer>
+
 </body>
 </html>
