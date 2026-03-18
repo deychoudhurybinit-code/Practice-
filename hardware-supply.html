@@ -22,7 +22,6 @@ font-weight:bold;
 position:relative;
 }
 
-/* ADMIN BUTTON */
 .admin-btn{
 position:absolute;
 right:20px;
@@ -35,7 +34,6 @@ cursor:pointer;
 font-size:14px;
 }
 
-/* FILTER */
 .filters{
 display:flex;
 gap:10px;
@@ -51,7 +49,6 @@ color:white;
 border:none;
 }
 
-/* PRODUCTS */
 .products{
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
@@ -85,6 +82,23 @@ font-size:18px;
 text-decoration:line-through;
 color:red;
 }
+
+button{
+padding:8px;
+margin-top:5px;
+border:none;
+cursor:pointer;
+background:#00ffcc;
+color:black;
+border-radius:5px;
+}
+
+.cart-box{
+padding:20px;
+background:#111;
+margin:20px;
+border-radius:10px;
+}
 </style>
 </head>
 
@@ -107,8 +121,23 @@ DCCV Hardware Supply
 
 <div class="products" id="productList"></div>
 
+<!-- CART -->
+<div class="cart-box">
+<h2>🛒 Cart</h2>
+
+<div id="cartItems"></div>
+
+<h3 id="total">Total: ₹0</h3>
+
+<input id="custName" placeholder="Your Name" style="padding:10px;width:100%;margin:5px 0;">
+<input id="custPhone" placeholder="Phone Number" style="padding:10px;width:100%;margin:5px 0;">
+
+<button onclick="placeOrder()">Place Order</button>
+</div>
+
 <script>
-// 🔥 DEMO PRODUCTS (5 items, 2 categories)
+
+// PRODUCTS
 let allProducts = [
 {
 name:"TMT Bar 12mm",
@@ -167,20 +196,23 @@ image:"https://via.placeholder.com/300"
 }
 ];
 
+let cart = [];
+
 const productList = document.getElementById("productList");
 const categoryFilter = document.getElementById("categoryFilter");
 const subCategoryFilter = document.getElementById("subCategoryFilter");
 
-// LOAD FILTER OPTIONS
+// LOAD FILTERS
 function loadFilters(){
 let categories = [...new Set(allProducts.map(p=>p.category))];
 
+categoryFilter.innerHTML = `<option value="">All Category</option>`;
 categories.forEach(cat=>{
 categoryFilter.innerHTML += `<option value="${cat}">${cat}</option>`;
 });
 }
 
-// APPLY FILTER
+// FILTER
 function applyFilter(){
 let cat = categoryFilter.value;
 let sub = subCategoryFilter.value;
@@ -192,7 +224,7 @@ return (!cat || p.category===cat) &&
 
 displayProducts(filtered);
 
-// update subcategory dynamically
+// update subcategory
 let subs = [...new Set(
 allProducts
 .filter(p=>!cat || p.category===cat)
@@ -209,7 +241,7 @@ subCategoryFilter.innerHTML += `<option value="${s}">${s}</option>`;
 function displayProducts(products){
 productList.innerHTML="";
 
-products.forEach(p=>{
+products.forEach((p,index)=>{
 let finalPrice = p.price - (p.price * p.discount / 100);
 
 productList.innerHTML += `
@@ -225,13 +257,96 @@ productList.innerHTML += `
 ₹${finalPrice.toFixed(2)}
 <span class="old-price">₹${p.price}</span>
 </p>
+
+<button onclick="addToCart(${index})">Add to Cart</button>
 </div>
 </div>
 `;
 });
 }
 
-// ADMIN NAVIGATION
+// ADD TO CART
+function addToCart(index){
+let product = allProducts[index];
+
+let existing = cart.find(item=>item.name === product.name);
+
+if(existing){
+existing.qty++;
+}else{
+cart.push({...product, qty:1});
+}
+
+updateCart();
+}
+
+// UPDATE CART
+function updateCart(){
+let cartDiv = document.getElementById("cartItems");
+let total = 0;
+
+cartDiv.innerHTML="";
+
+cart.forEach((item,i)=>{
+let price = item.price - (item.price * item.discount / 100);
+let subtotal = price * item.qty;
+total += subtotal;
+
+cartDiv.innerHTML += `
+<div>
+${item.name} (₹${price})  
+Qty: 
+<button onclick="changeQty(${i},-1)">-</button>
+${item.qty}
+<button onclick="changeQty(${i},1)">+</button>
+= ₹${subtotal.toFixed(2)}
+</div>
+<hr>
+`;
+});
+
+document.getElementById("total").innerText = "Total: ₹" + total.toFixed(2);
+}
+
+// CHANGE QTY
+function changeQty(i,change){
+cart[i].qty += change;
+
+if(cart[i].qty <= 0){
+cart.splice(i,1);
+}
+
+updateCart();
+}
+
+// ORDER
+function placeOrder(){
+let name = document.getElementById("custName").value;
+let phone = document.getElementById("custPhone").value;
+
+if(cart.length===0){
+alert("Cart empty!");
+return;
+}
+
+let msg = "New Order:\n";
+
+cart.forEach(item=>{
+msg += `${item.name} x ${item.qty}\n`;
+});
+
+msg += `\nCustomer: ${name}\nPhone: ${phone}`;
+
+let url = `https://wa.me/91XXXXXXXXXX?text=${encodeURIComponent(msg)}`;
+window.open(url);
+
+alert("Order Sent!");
+
+cart = [];
+updateCart();
+}
+
+// ADMIN
 function goAdmin(){
 window.location.href = "admin-hardware.html";
 }
@@ -239,6 +354,7 @@ window.location.href = "admin-hardware.html";
 // INIT
 loadFilters();
 displayProducts(allProducts);
+
 </script>
 
 </body>
