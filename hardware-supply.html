@@ -3,22 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hardware Supply | DCCV</title>
+<title>DCCV Hardware Store</title>
 
 <style>
-body{
-margin:0;
-font-family:Arial;
-background:#000;
-color:#fff;
-}
+body{margin:0;font-family:Arial;background:#000;color:#fff;}
 
 header{
 background:#0b1f3a;
 padding:15px;
 text-align:center;
 font-size:22px;
-font-weight:bold;
 position:relative;
 }
 
@@ -28,27 +22,39 @@ right:20px;
 top:15px;
 background:#00ffcc;
 color:black;
-padding:8px 15px;
-border-radius:5px;
+padding:8px;
 cursor:pointer;
-font-size:14px;
 }
 
-.filters{
-display:flex;
-gap:10px;
-padding:10px;
+/* LOGIN */
+.login-box{
 background:#111;
-flex-wrap:wrap;
+padding:20px;
+text-align:center;
 }
 
-select{
+input{
 padding:10px;
-background:#222;
-color:white;
-border:none;
+margin:5px;
+width:90%;
+max-width:300px;
 }
 
+button{
+padding:10px;
+margin-top:5px;
+border:none;
+cursor:pointer;
+background:#00ffcc;
+color:black;
+width:90%;
+max-width:300px;
+}
+
+/* SEARCH */
+.search-box{padding:10px;background:#111;text-align:center;}
+
+/* PRODUCTS */
 .products{
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
@@ -56,48 +62,21 @@ gap:20px;
 padding:20px;
 }
 
-.card{
-background:#111;
-border-radius:10px;
-overflow:hidden;
-box-shadow:0 0 10px rgba(0,0,0,0.5);
-}
-
-.card img{
-width:100%;
-height:200px;
-object-fit:cover;
-}
-
-.card-content{
-padding:15px;
-}
-
-.price{
-color:#00ffcc;
-font-size:18px;
-}
-
-.old-price{
-text-decoration:line-through;
-color:red;
-}
-
-button{
-padding:8px;
-margin-top:5px;
-border:none;
-cursor:pointer;
-background:#00ffcc;
-color:black;
-border-radius:5px;
-}
+.card{background:#111;border-radius:10px;overflow:hidden;}
+.card img{width:100%;height:200px;object-fit:cover;}
+.card-content{padding:15px;}
 
 .cart-box{
-padding:20px;
 background:#111;
 margin:20px;
+padding:20px;
 border-radius:10px;
+}
+
+.qty-btn{
+font-size:18px;
+padding:5px 10px;
+margin:5px;
 }
 </style>
 </head>
@@ -105,18 +84,23 @@ border-radius:10px;
 <body>
 
 <header>
-DCCV Hardware Supply
-<div class="admin-btn" onclick="goAdmin()">Admin Panel</div>
+DCCV Hardware
+<div class="admin-btn" onclick="alert('Admin Page')">Admin</div>
 </header>
 
-<div class="filters">
-<select id="categoryFilter" onchange="applyFilter()">
-<option value="">All Category</option>
-</select>
+<!-- LOGIN -->
+<div class="login-box">
+<h3>Customer Login</h3>
+<input id="email" placeholder="Email">
+<input id="password" placeholder="Password" type="password">
+<button onclick="signup()">Signup</button>
+<button onclick="login()">Login</button>
+<p id="userStatus"></p>
+</div>
 
-<select id="subCategoryFilter" onchange="applyFilter()">
-<option value="">All Subcategory</option>
-</select>
+<!-- SEARCH -->
+<div class="search-box">
+<input id="search" placeholder="Search..." onkeyup="searchProducts()">
 </div>
 
 <div class="products" id="productList"></div>
@@ -124,235 +108,151 @@ DCCV Hardware Supply
 <!-- CART -->
 <div class="cart-box">
 <h2>🛒 Cart</h2>
-
 <div id="cartItems"></div>
+<h2 id="total">Total: ₹0</h2>
 
-<h3 id="total">Total: ₹0</h3>
+<input id="custName" placeholder="Your Name">
+<input id="custPhone" placeholder="Phone">
 
-<input id="custName" placeholder="Your Name" style="padding:10px;width:100%;margin:5px 0;">
-<input id="custPhone" placeholder="Phone Number" style="padding:10px;width:100%;margin:5px 0;">
-
-<button onclick="placeOrder()">Place Order</button>
+<button onclick="payUPI()">💳 Pay via UPI</button>
+<button onclick="downloadInvoice()">🧾 Download Invoice (PDF)</button>
+<button onclick="placeOrder()">📦 Place Order</button>
 </div>
+
+<!-- jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
 
 // PRODUCTS
-let allProducts = [
-{
-name:"TMT Bar 12mm",
-category:"Steel",
-subCategory:"TMT",
-size:"12mm",
-price:600,
-discount:10,
-quantity:50,
-description:"High strength TMT bar",
-image:"https://via.placeholder.com/300"
-},
-{
-name:"TMT Bar 16mm",
-category:"Steel",
-subCategory:"TMT",
-size:"16mm",
-price:750,
-discount:5,
-quantity:40,
-description:"Durable steel rod",
-image:"https://via.placeholder.com/300"
-},
-{
-name:"Binding Wire",
-category:"Steel",
-subCategory:"Accessories",
-size:"1kg",
-price:80,
-discount:0,
-quantity:100,
-description:"Strong binding wire",
-image:"https://via.placeholder.com/300"
-},
-{
-name:"OPC Cement",
-category:"Cement",
-subCategory:"OPC",
-size:"50kg",
-price:420,
-discount:8,
-quantity:200,
-description:"Premium OPC cement",
-image:"https://via.placeholder.com/300"
-},
-{
-name:"PPC Cement",
-category:"Cement",
-subCategory:"PPC",
-size:"50kg",
-price:390,
-discount:5,
-quantity:180,
-description:"High quality PPC cement",
-image:"https://via.placeholder.com/300"
-}
+let allProducts=[
+{name:"TMT Bar",price:600,discount:10,image:"https://via.placeholder.com/300"},
+{name:"Cement OPC",price:420,discount:5,image:"https://via.placeholder.com/300"},
+{name:"Binding Wire",price:80,discount:0,image:"https://via.placeholder.com/300"}
 ];
 
-let cart = [];
-
-const productList = document.getElementById("productList");
-const categoryFilter = document.getElementById("categoryFilter");
-const subCategoryFilter = document.getElementById("subCategoryFilter");
-
-// LOAD FILTERS
-function loadFilters(){
-let categories = [...new Set(allProducts.map(p=>p.category))];
-
-categoryFilter.innerHTML = `<option value="">All Category</option>`;
-categories.forEach(cat=>{
-categoryFilter.innerHTML += `<option value="${cat}">${cat}</option>`;
-});
-}
-
-// FILTER
-function applyFilter(){
-let cat = categoryFilter.value;
-let sub = subCategoryFilter.value;
-
-let filtered = allProducts.filter(p=>{
-return (!cat || p.category===cat) &&
-(!sub || p.subCategory===sub);
-});
-
-displayProducts(filtered);
-
-// update subcategory
-let subs = [...new Set(
-allProducts
-.filter(p=>!cat || p.category===cat)
-.map(p=>p.subCategory)
-)];
-
-subCategoryFilter.innerHTML = `<option value="">All Subcategory</option>`;
-subs.forEach(s=>{
-subCategoryFilter.innerHTML += `<option value="${s}">${s}</option>`;
-});
-}
+let cart=[];
+let currentUser=null;
 
 // DISPLAY PRODUCTS
-function displayProducts(products){
+function displayProducts(p){
 productList.innerHTML="";
+p.forEach((item,i)=>{
+let price=item.price-(item.price*item.discount/100);
 
-products.forEach((p,index)=>{
-let finalPrice = p.price - (p.price * p.discount / 100);
-
-productList.innerHTML += `
+productList.innerHTML+=`
 <div class="card">
-<img src="${p.image}">
+<img src="${item.image}">
 <div class="card-content">
-<h3>${p.name}</h3>
-<p>${p.description}</p>
-<p>Size: ${p.size}</p>
-<p>Stock: ${p.quantity}</p>
-
-<p class="price">
-₹${finalPrice.toFixed(2)}
-<span class="old-price">₹${p.price}</span>
-</p>
-
-<button onclick="addToCart(${index})">Add to Cart</button>
+<h3>${item.name}</h3>
+<p>₹${price}</p>
+<button onclick="addToCart(${i})">Add to Cart</button>
 </div>
 </div>
 `;
 });
 }
 
-// ADD TO CART
-function addToCart(index){
-let product = allProducts[index];
-
-let existing = cart.find(item=>item.name === product.name);
-
-if(existing){
-existing.qty++;
-}else{
-cart.push({...product, qty:1});
+// SEARCH
+function searchProducts(){
+let val=search.value.toLowerCase();
+let filtered=allProducts.filter(p=>p.name.toLowerCase().includes(val));
+displayProducts(filtered);
 }
 
+// CART
+function addToCart(i){
+let item=allProducts[i];
+let exist=cart.find(x=>x.name===item.name);
+if(exist) exist.qty++;
+else cart.push({...item,qty:1});
 updateCart();
 }
 
-// UPDATE CART
 function updateCart(){
-let cartDiv = document.getElementById("cartItems");
-let total = 0;
-
-cartDiv.innerHTML="";
+cartItems.innerHTML="";
+let total=0;
 
 cart.forEach((item,i)=>{
-let price = item.price - (item.price * item.discount / 100);
-let subtotal = price * item.qty;
-total += subtotal;
+let price=item.price-(item.price*item.discount/100);
+let sub=price*item.qty;
+total+=sub;
 
-cartDiv.innerHTML += `
+cartItems.innerHTML+=`
 <div>
-${item.name} (₹${price})  
-Qty: 
-<button onclick="changeQty(${i},-1)">-</button>
+${item.name} - ₹${sub}<br>
+<button class="qty-btn" onclick="changeQty(${i},-1)">-</button>
 ${item.qty}
-<button onclick="changeQty(${i},1)">+</button>
-= ₹${subtotal.toFixed(2)}
-</div>
+<button class="qty-btn" onclick="changeQty(${i},1)">+</button>
 <hr>
-`;
+</div>`;
 });
 
-document.getElementById("total").innerText = "Total: ₹" + total.toFixed(2);
+total.innerText="Total: ₹"+total;
 }
 
-// CHANGE QTY
-function changeQty(i,change){
-cart[i].qty += change;
-
-if(cart[i].qty <= 0){
-cart.splice(i,1);
-}
-
+function changeQty(i,c){
+cart[i].qty+=c;
+if(cart[i].qty<=0) cart.splice(i,1);
 updateCart();
+}
+
+// UPI PAYMENT
+function payUPI(){
+let amt=total.innerText.replace("Total: ₹","");
+window.location=`upi://pay?pa=deychoudhurybinit@oksbi&pn=DCCV&am=${amt}&cu=INR`;
+}
+
+// PDF INVOICE
+function downloadInvoice(){
+const { jsPDF } = window.jspdf;
+let doc=new jsPDF();
+
+doc.text("DCCV Invoice",20,20);
+
+let y=40;
+cart.forEach(item=>{
+doc.text(`${item.name} x ${item.qty}`,20,y);
+y+=10;
+});
+
+doc.text(total.innerText,20,y+10);
+
+doc.save("invoice.pdf");
 }
 
 // ORDER
 function placeOrder(){
-let name = document.getElementById("custName").value;
-let phone = document.getElementById("custPhone").value;
-
-if(cart.length===0){
-alert("Cart empty!");
+if(!currentUser){
+alert("Login first!");
 return;
 }
-
-let msg = "New Order:\n";
-
-cart.forEach(item=>{
-msg += `${item.name} x ${item.qty}\n`;
-});
-
-msg += `\nCustomer: ${name}\nPhone: ${phone}`;
-
-let url = `https://wa.me/91XXXXXXXXXX?text=${encodeURIComponent(msg)}`;
-window.open(url);
-
-alert("Order Sent!");
-
-cart = [];
+alert("Order placed!");
+cart=[];
 updateCart();
 }
 
-// ADMIN
-function goAdmin(){
-window.location.href = "admin-hardware.html";
+// LOGIN SYSTEM (basic demo)
+function signup(){
+let email=document.getElementById("email").value;
+let pass=document.getElementById("password").value;
+localStorage.setItem(email,pass);
+alert("Signup done");
+}
+
+function login(){
+let email=document.getElementById("email").value;
+let pass=document.getElementById("password").value;
+
+if(localStorage.getItem(email)===pass){
+currentUser=email;
+userStatus.innerText="Logged in: "+email;
+}else{
+alert("Invalid login");
+}
 }
 
 // INIT
-loadFilters();
 displayProducts(allProducts);
 
 </script>
