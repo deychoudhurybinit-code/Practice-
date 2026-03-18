@@ -19,13 +19,29 @@ padding:15px;
 text-align:center;
 font-size:22px;
 font-weight:bold;
+position:relative;
 }
 
+/* ADMIN BUTTON */
+.admin-btn{
+position:absolute;
+right:20px;
+top:15px;
+background:#00ffcc;
+color:black;
+padding:8px 15px;
+border-radius:5px;
+cursor:pointer;
+font-size:14px;
+}
+
+/* FILTER */
 .filters{
 display:flex;
 gap:10px;
 padding:10px;
 background:#111;
+flex-wrap:wrap;
 }
 
 select{
@@ -35,6 +51,7 @@ color:white;
 border:none;
 }
 
+/* PRODUCTS */
 .products{
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
@@ -68,54 +85,134 @@ font-size:18px;
 text-decoration:line-through;
 color:red;
 }
-
 </style>
 </head>
 
 <body>
 
-<header>DCCV Hardware Supply</header>
+<header>
+DCCV Hardware Supply
+<div class="admin-btn" onclick="goAdmin()">Admin Panel</div>
+</header>
 
 <div class="filters">
-<select id="categoryFilter">
+<select id="categoryFilter" onchange="applyFilter()">
 <option value="">All Category</option>
 </select>
 
-<select id="subCategoryFilter">
+<select id="subCategoryFilter" onchange="applyFilter()">
 <option value="">All Subcategory</option>
 </select>
 </div>
 
 <div class="products" id="productList"></div>
 
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
-
 <script>
-// 🔥 YOUR FIREBASE CONFIG
-const firebaseConfig = {
-apiKey: "YOUR_KEY",
-authDomain: "YOUR_DOMAIN",
-projectId: "YOUR_ID",
-storageBucket: "YOUR_BUCKET",
-};
-
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+// 🔥 DEMO PRODUCTS (5 items, 2 categories)
+let allProducts = [
+{
+name:"TMT Bar 12mm",
+category:"Steel",
+subCategory:"TMT",
+size:"12mm",
+price:600,
+discount:10,
+quantity:50,
+description:"High strength TMT bar",
+image:"https://via.placeholder.com/300"
+},
+{
+name:"TMT Bar 16mm",
+category:"Steel",
+subCategory:"TMT",
+size:"16mm",
+price:750,
+discount:5,
+quantity:40,
+description:"Durable steel rod",
+image:"https://via.placeholder.com/300"
+},
+{
+name:"Binding Wire",
+category:"Steel",
+subCategory:"Accessories",
+size:"1kg",
+price:80,
+discount:0,
+quantity:100,
+description:"Strong binding wire",
+image:"https://via.placeholder.com/300"
+},
+{
+name:"OPC Cement",
+category:"Cement",
+subCategory:"OPC",
+size:"50kg",
+price:420,
+discount:8,
+quantity:200,
+description:"Premium OPC cement",
+image:"https://via.placeholder.com/300"
+},
+{
+name:"PPC Cement",
+category:"Cement",
+subCategory:"PPC",
+size:"50kg",
+price:390,
+discount:5,
+quantity:180,
+description:"High quality PPC cement",
+image:"https://via.placeholder.com/300"
+}
+];
 
 const productList = document.getElementById("productList");
+const categoryFilter = document.getElementById("categoryFilter");
+const subCategoryFilter = document.getElementById("subCategoryFilter");
 
-function loadProducts(){
-db.collection("hardware").onSnapshot(snapshot=>{
-productList.innerHTML = "";
+// LOAD FILTER OPTIONS
+function loadFilters(){
+let categories = [...new Set(allProducts.map(p=>p.category))];
 
-snapshot.forEach(doc=>{
-const p = doc.data();
+categories.forEach(cat=>{
+categoryFilter.innerHTML += `<option value="${cat}">${cat}</option>`;
+});
+}
 
+// APPLY FILTER
+function applyFilter(){
+let cat = categoryFilter.value;
+let sub = subCategoryFilter.value;
+
+let filtered = allProducts.filter(p=>{
+return (!cat || p.category===cat) &&
+(!sub || p.subCategory===sub);
+});
+
+displayProducts(filtered);
+
+// update subcategory dynamically
+let subs = [...new Set(
+allProducts
+.filter(p=>!cat || p.category===cat)
+.map(p=>p.subCategory)
+)];
+
+subCategoryFilter.innerHTML = `<option value="">All Subcategory</option>`;
+subs.forEach(s=>{
+subCategoryFilter.innerHTML += `<option value="${s}">${s}</option>`;
+});
+}
+
+// DISPLAY PRODUCTS
+function displayProducts(products){
+productList.innerHTML="";
+
+products.forEach(p=>{
 let finalPrice = p.price - (p.price * p.discount / 100);
 
-let card = `
+productList.innerHTML += `
 <div class="card">
 <img src="${p.image}">
 <div class="card-content">
@@ -131,13 +228,17 @@ let card = `
 </div>
 </div>
 `;
-
-productList.innerHTML += card;
-});
 });
 }
 
-loadProducts();
+// ADMIN NAVIGATION
+function goAdmin(){
+window.location.href = "admin-hardware.html";
+}
+
+// INIT
+loadFilters();
+displayProducts(allProducts);
 </script>
 
 </body>
