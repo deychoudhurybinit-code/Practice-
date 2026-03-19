@@ -1,1 +1,171 @@
-<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <title>Admin Panel</title>\n    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">\n    <link rel="stylesheet" href="styles.css">\n</head>\n<body>\n    <div class="sidebar">\n        <h2>Admin Panel</h2>\n        <ul>\n            <li><a href="#dashboard">Dashboard</a></li>\n            <li><a href="#quote-requests">Quote Requests</a></li>\n            <li><a href="#orders">Orders</a></li>\n            <li><a href="#services">Services</a></li>\n            <li><a href="#users">Users</a></li>\n            <li><a href="#settings">Settings</a></li>\n        </ul>\n    </div>\n    <div class="main-content">\n        <h1>Admin Dashboard</h1>\n        <section id="dashboard">\n            <h2>Dashboard</h2>\n            <p>Overview of key metrics and data.</p>\n        </section>\n        <section id="quote-requests">\n            <h2>Quote Requests</h2>\n            <p>Manage and review quote requests.</p>\n        </section>\n        <section id="orders">\n            <h2>Orders</h2>\n            <p>View and manage orders placed by users.</p>\n        </section>\n        <section id="services">\n            <h2>Services</h2>\n            <p>Manage the services offered.</p>\n        </section>\n        <section id="users">\n            <h2>Users</h2>\n            <p>Manage user accounts and profiles.</p>\n        </section>\n        <section id="settings">\n            <h2>Settings</h2>\n            <p>Manage application settings.</p>\n        </section>\n    </div>\n</body>\n</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DCCV Main Admin Panel</title>
+
+<style>
+body{
+background:#000;
+color:#fff;
+font-family:Arial;
+margin:0;
+padding:20px;
+}
+
+h1{
+text-align:center;
+color:#f4b400;
+}
+
+.form-box{
+background:#111;
+padding:20px;
+border-radius:10px;
+max-width:400px;
+margin:40px auto;
+text-align:center;
+}
+
+input{
+padding:10px;
+margin:10px;
+width:80%;
+border:none;
+border-radius:5px;
+}
+
+button{
+padding:10px;
+background:#f4b400;
+border:none;
+cursor:pointer;
+width:50%;
+font-weight:bold;
+}
+
+.card{
+background:#111;
+padding:15px;
+margin:15px 0;
+border-radius:10px;
+box-shadow:0 5px 15px rgba(0,0,0,0.5);
+}
+
+.card p{
+margin:5px 0;
+}
+
+#logoutBtn{
+display:block;
+margin:20px auto;
+}
+</style>
+</head>
+
+<body>
+
+<h1>👑 DCCV Main Admin Panel</h1>
+
+<!-- LOGIN -->
+<div class="form-box" id="loginBox">
+<h2>Admin Login</h2>
+<input type="text" id="email" placeholder="Admin Email">
+<input type="password" id="password" placeholder="Password">
+<button onclick="adminLogin()">Login</button>
+</div>
+
+<!-- LOGOUT -->
+<button id="logoutBtn" onclick="logout()" style="display:none;">Logout</button>
+
+<!-- DATA -->
+<div id="data" style="display:none;"></div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } 
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+// 🔥 YOUR FIREBASE CONFIG
+const firebaseConfig = {
+  apiKey: "YOUR_KEY",
+  authDomain: "YOUR_DOMAIN",
+  projectId: "YOUR_PROJECT_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+// LOGIN FUNCTION
+window.adminLogin = async function(){
+
+let email = document.getElementById("email").value;
+let password = document.getElementById("password").value;
+
+try{
+  await signInWithEmailAndPassword(auth,email,password);
+}catch(e){
+  alert("❌ Wrong admin login");
+}
+
+}
+
+// LOGOUT FUNCTION
+window.logout = async function(){
+await signOut(auth);
+location.reload();
+}
+
+// CHECK AUTH
+onAuthStateChanged(auth, async (user) => {
+
+if(user && user.email === "admin@dccv.com"){
+
+document.getElementById("loginBox").style.display="none";
+document.getElementById("data").style.display="block";
+document.getElementById("logoutBtn").style.display="block";
+
+loadData();
+
+}else{
+document.getElementById("loginBox").style.display="block";
+document.getElementById("data").style.display="none";
+}
+
+});
+
+// LOAD ALL LEADS
+async function loadData(){
+
+const querySnapshot = await getDocs(collection(db,"leads"));
+
+let container = document.getElementById("data");
+container.innerHTML = "";
+
+querySnapshot.forEach((doc)=>{
+
+let d = doc.data();
+
+container.innerHTML += `
+<div class="card">
+<p><b>Name:</b> ${d.name}</p>
+<p><b>Phone:</b> ${d.phone}</p>
+<p><b>Service:</b> ${d.service}</p>
+<p><b>Area:</b> ${d.area}</p>
+<p><b>Details:</b> ${d.details}</p>
+<p><b>Category:</b> ${d.category}</p>
+</div>
+`;
+
+});
+
+}
+
+</script>
+
+</body>
+</html>
