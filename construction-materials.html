@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DCCV Construction Materials Store</title>
+
 <style>
 body{
 margin:0;
@@ -12,108 +13,136 @@ background:#000;
 color:white;
 text-align:center;
 }
+
 header{
 background:#0b1f3a;
 padding:20px;
+position:relative;
 }
-h1{
-color:#f4b400;
-}
-.container{
-padding:40px;
-}
-.order-box{
-background:#111;
-padding:30px;
-border-radius:10px;
-max-width:800px;
-margin:auto;
-}
-input,select,textarea{
-width:90%;
-padding:10px;
-margin:10px;
-border:none;
+
+h1{ color:#f4b400; }
+
+.admin-btn{
+position:absolute;
+right:20px;
+top:20px;
+background:#00ffcc;
+color:black;
+padding:8px 15px;
+cursor:pointer;
 border-radius:5px;
 }
+
+/* SEARCH */
+.search-box{
+padding:10px;
+background:#111;
+}
+
+.search-box input{
+width:90%;
+padding:10px;
+}
+
+/* FILTER */
+.filters{
+padding:10px;
+background:#111;
+}
+
+select{
+padding:10px;
+margin:5px;
+}
+
+/* PRODUCTS */
+.products{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:20px;
+padding:20px;
+}
+
+.card{
+background:#111;
+padding:15px;
+border-radius:10px;
+}
+
 button{
 background:#f4b400;
 border:none;
-padding:10px 20px;
-font-weight:bold;
+padding:10px;
 cursor:pointer;
-margin-top:10px;
+margin-top:5px;
 }
+
 table{
 width:100%;
 margin-top:20px;
 border-collapse:collapse;
 }
+
 th,td{
 border:1px solid #444;
 padding:10px;
 }
+
 .total{
 font-size:20px;
 margin-top:20px;
 color:#f4b400;
 }
-.stock{
-font-weight:bold;
-margin-top:10px;
-color:lightgreen;
+
+.qty-btn{
+padding:5px 10px;
+font-size:18px;
+margin:5px;
 }
 </style>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
+
 <body>
+
 <header>
 <h1>DCCV CONSTRUCTION MATERIAL STORE</h1>
+<div class="admin-btn" onclick="goAdmin()">Admin Panel</div>
 </header>
 
-<div class="container">
-<h2>Order Construction Materials</h2>
-<div class="order-box">
-<input type="text" id="name" placeholder="Customer Name">
-<input type="text" id="phone" placeholder="Phone Number">
+<!-- SEARCH -->
+<div class="search-box">
+<input type="text" id="search" placeholder="Search material..." onkeyup="searchProducts()">
+</div>
 
-<select id="material" onchange="checkStock()">
-<optgroup label="🧱 Bricks">
-<option value="7" data-stock="5000">Fly Ash Brick (₹7 per piece)</option>
-</optgroup>
-<optgroup label="🏖 Sand Types">
-<option value="65" data-stock="1000">White River Sand (₹65 per CFT)</option>
-<option value="60" data-stock="1200">River Sand (₹60 per CFT)</option>
-<option value="55" data-stock="900">M-Sand (Manufactured Sand) (₹55 per CFT)</option>
-</optgroup>
-<optgroup label="🪨 Stone / Aggregate">
-<option value="75" data-stock="800">10mm Aggregate (₹75 per CFT)</option>
-<option value="78" data-stock="750">20mm Aggregate (₹78 per CFT)</option>
-<option value="80" data-stock="700">40mm Aggregate (₹80 per CFT)</option>
-<option value="70" data-stock="900">Stone Dust (₹70 per CFT)</option>
-</optgroup>
-<optgroup label="🏗 Cement Brands">
-<option value="420" data-stock="200">UltraTech OPC 43 Grade (₹420 per bag)</option>
-<option value="440" data-stock="180">UltraTech OPC 53 Grade (₹440 per bag)</option>
-<option value="410" data-stock="160">ACC OPC 53 Grade (₹410 per bag)</option>
-<option value="400" data-stock="200">Dalmia PPC Cement (₹400 per bag)</option>
-<option value="395" data-stock="220">Ambuja PPC Cement (₹395 per bag)</option>
-</optgroup>
-<optgroup label="🔩 Steel">
-<option value="70" data-stock="300">TMT Steel Rod (₹70 per kg)</option>
-</optgroup>
+<!-- FILTER -->
+<div class="filters">
+<select id="categoryFilter" onchange="applyFilter()">
+<option value="">All Category</option>
 </select>
 
-<div id="stockStatus" class="stock"></div>
-<input type="number" id="qty" placeholder="Quantity">
-<button onclick="addToCart()">Add To Cart</button>
+<select id="subCategoryFilter" onchange="applyFilter()">
+<option value="">All Subcategory</option>
+</select>
+</div>
+
+<!-- PRODUCTS -->
+<div class="products" id="productList"></div>
+
+<!-- CART -->
+<div class="container">
+<div class="order-box">
+
+<input type="text" id="name" placeholder="Customer Name">
+<input type="text" id="phone" placeholder="Phone Number">
 
 <table id="cart">
 <tr>
 <th>Material</th>
 <th>Qty</th>
 <th>Price</th>
+<th>Action</th>
 </tr>
 </table>
 
@@ -121,119 +150,159 @@ color:lightgreen;
 
 <input type="text" id="location" placeholder="Delivery Location">
 
+<button onclick="payUPI()">💳 Pay via UPI</button>
 <button onclick="placeOrder()">Send Order on WhatsApp</button>
-<button onclick="payRazor()">Pay via Razorpay</button>
 <button onclick="downloadInvoice()">Download GST Invoice</button>
+
 </div>
 </div>
 
 <script>
-let total=0;
+
+// PRODUCTS WITH CATEGORY
+let allProducts = [
+{name:"Fly Ash Brick",category:"Bricks",subCategory:"Standard",price:7,stock:5000},
+{name:"River Sand",category:"Sand",subCategory:"Natural",price:60,stock:1200},
+{name:"M Sand",category:"Sand",subCategory:"Manufactured",price:55,stock:900},
+{name:"20mm Aggregate",category:"Stone",subCategory:"Aggregate",price:78,stock:750},
+{name:"UltraTech OPC 53",category:"Cement",subCategory:"OPC",price:440,stock:180},
+{name:"Ambuja PPC",category:"Cement",subCategory:"PPC",price:395,stock:220},
+{name:"TMT Steel Rod",category:"Steel",subCategory:"TMT",price:70,stock:300}
+];
+
 let cartItems=[];
-let orderText="";
-let invoiceCounter = Date.now();
+let total=0;
 
-checkStock();
+const productList=document.getElementById("productList");
 
-function checkStock(){
-let material=document.getElementById("material");
-let stock=material.options[material.selectedIndex].dataset.stock;
-let status=document.getElementById("stockStatus");
-if(stock>0){
-status.innerHTML="Stock Available: "+stock;
-status.style.color="lightgreen";
-}else{
-status.innerHTML="Out of Stock";
-status.style.color="red";
-}
+// LOAD FILTERS
+function loadFilters(){
+let cats=[...new Set(allProducts.map(p=>p.category))];
+cats.forEach(c=>{
+categoryFilter.innerHTML+=`<option value="${c}">${c}</option>`;
+});
 }
 
-function addToCart(){
-let material=document.getElementById("material");
-let name=material.options[material.selectedIndex].text;
-let price=parseFloat(material.value);
-let stock=material.options[material.selectedIndex].dataset.stock;
-let qty=parseFloat(document.getElementById("qty").value);
+// DISPLAY
+function displayProducts(list){
+productList.innerHTML="";
+list.forEach((p,i)=>{
+productList.innerHTML+=`
+<div class="card">
+<h3>${p.name}</h3>
+<p>₹${p.price}</p>
+<p>Stock: ${p.stock}</p>
 
-if(qty>stock){
-alert("Not enough stock available");
-return;
+<input type="number" id="qty${i}" placeholder="Qty">
+
+<button onclick="addToCart(${i})">Add</button>
+</div>`;
+});
 }
-let itemTotal=price*qty;
-let table=document.getElementById("cart");
-let row=table.insertRow();
-row.insertCell(0).innerText=name;
+
+// SEARCH
+function searchProducts(){
+let val=search.value.toLowerCase();
+let f=allProducts.filter(p=>p.name.toLowerCase().includes(val));
+displayProducts(f);
+}
+
+// FILTER
+function applyFilter(){
+let cat=categoryFilter.value;
+let sub=subCategoryFilter.value;
+
+let f=allProducts.filter(p=>
+(!cat||p.category==cat)&&(!sub||p.subCategory==sub)
+);
+
+displayProducts(f);
+}
+
+// ADD CART
+function addToCart(i){
+let p=allProducts[i];
+let qty=parseInt(document.getElementById("qty"+i).value);
+
+if(!qty||qty<=0) return alert("Enter quantity");
+if(qty>p.stock) return alert("Stock not enough");
+
+let itemTotal=p.price*qty;
+
+let row=document.getElementById("cart").insertRow();
+row.insertCell(0).innerText=p.name;
 row.insertCell(1).innerText=qty;
 row.insertCell(2).innerText="₹"+itemTotal;
+
+let btn=document.createElement("button");
+btn.innerText="Remove";
+btn.onclick=()=>{
+total-=itemTotal;
+document.getElementById("total").innerText=total;
+row.remove();
+};
+
+row.insertCell(3).appendChild(btn);
+
 total+=itemTotal;
 document.getElementById("total").innerText=total;
-cartItems.push({name:name,qty:qty,price:itemTotal});
-orderText+=name+" x "+qty+" = ₹"+itemTotal+"%0A";
+
+cartItems.push({name:p.name,qty:qty,price:itemTotal});
 }
 
+// UPI
+function payUPI(){
+let amt=document.getElementById("total").innerText;
+window.location=`upi://pay?pa=deychoudhurybinit@oksbi&pn=DCCV&am=${amt}&cu=INR`;
+}
+
+// WHATSAPP ORDER
 function placeOrder(){
 let name=document.getElementById("name").value;
 let phone=document.getElementById("phone").value;
-let location=document.getElementById("location").value;
-let message="DCCV MATERIAL ORDER%0A%0A"+
-"Customer: "+name+"%0A"+
-"Phone: "+phone+"%0A%0A"+
-orderText+
-"%0ATotal: ₹"+total+"%0A"+
-"Delivery Location: "+location;
-window.open("https://wa.me/918402933354?text="+message);
+let loc=document.getElementById("location").value;
+
+let msg="DCCV ORDER\n\nCustomer:"+name+"\nPhone:"+phone+"\n";
+
+cartItems.forEach(i=>{
+msg+=`${i.name} x ${i.qty}\n`;
+});
+
+msg+="\nTotal ₹"+total+"\nLocation:"+loc;
+
+window.open("https://wa.me/918402933354?text="+encodeURIComponent(msg));
 }
 
+// INVOICE
 function downloadInvoice(){
 const { jsPDF } = window.jspdf;
-let doc = new jsPDF();
-let gst = total*0.18;
-let grandTotal = total+gst;
-let name = document.getElementById("name").value;
-let date = new Date().toLocaleDateString();
-let invoiceNo = invoiceCounter++;
+let doc=new jsPDF();
 
-doc.setFontSize(18);
-doc.text("DEY CHOUDHURY CONSTRUCTION VENTURES", 20, 20);
-doc.setFontSize(12);
-doc.text("GST INVOICE", 20, 30);
-doc.text("Invoice No: " + invoiceNo, 20, 40);
-doc.text("Date: " + date, 150, 40);
-doc.text("Customer: " + name, 20, 50);
+doc.text("DCCV GST Invoice",20,20);
 
-let y = 70;
-cartItems.forEach(item=>{
-doc.text(item.name + " x " + item.qty + " = ₹" + item.price, 20, y);
-y += 10;
+let y=40;
+cartItems.forEach(i=>{
+doc.text(`${i.name} x ${i.qty} ₹${i.price}`,20,y);
+y+=10;
 });
-doc.text("Subtotal: ₹" + total, 20, y+10);
-doc.text("GST (18%): ₹" + gst, 20, y+20);
-doc.text("Total: ₹" + grandTotal, 20, y+30);
 
-doc.save("DCCV_GST_Invoice_" + invoiceNo + ".pdf");
+let gst=total*0.18;
+doc.text("GST: ₹"+gst,20,y+10);
+doc.text("Total: ₹"+(total+gst),20,y+20);
+
+doc.save("DCCV_Invoice.pdf");
 }
 
-// Razorpay Payment
-function payRazor(){
-let amount=Math.round(total*100); // in paise
-var options = {
-    "key": "YOUR_RAZORPAY_KEY", 
-    "amount": amount,
-    "currency": "INR",
-    "name": "DCCV Construction Materials",
-    "description": "Material Purchase",
-    "handler": function (response){
-        alert("Payment Successful. Payment ID: " + response.razorpay_payment_id);
-    },
-    "prefill": {
-        "name": document.getElementById("name").value,
-        "contact": document.getElementById("phone").value
-    },
-    "theme": {"color":"#f4b400"}
-};
-var rzp1 = new Razorpay(options);
-rzp1.open();
+// ADMIN
+function goAdmin(){
+window.location="admin-material.html";
 }
+
+// INIT
+loadFilters();
+displayProducts(allProducts);
+
 </script>
+
 </body>
 </html>
