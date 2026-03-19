@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DCCV Admin Panel</title>
+
+<style>
+body{
+margin:0;
+font-family:Arial;
+background:#000;
+color:white;
+}
+
+header{
+background:#0b1f3a;
+padding:15px;
+text-align:center;
+font-size:22px;
+}
+
+.container{
+padding:20px;
+max-width:800px;
+margin:auto;
+}
+
+input, textarea{
+width:100%;
+padding:10px;
+margin:8px 0;
+border:none;
+border-radius:5px;
+}
+
+button{
+padding:10px;
+background:#00ffcc;
+border:none;
+cursor:pointer;
+margin-top:5px;
+width:100%;
+}
+
+.product-list{
+margin-top:20px;
+}
+
+.product{
+background:#111;
+padding:10px;
+margin:10px 0;
+border-radius:5px;
+}
+</style>
+</head>
+
+<body>
+
+<header>DCCV ADMIN PANEL</header>
+
+<div class="container">
+
+<h2>Add / Update Product</h2>
+
+<input id="name" placeholder="Product Name">
+<input id="category" placeholder="Category (Steel, Cement etc)">
+<input id="subCategory" placeholder="Subcategory">
+<input id="price" type="number" placeholder="Price">
+<input id="discount" type="number" placeholder="Discount %">
+<input id="stock" type="number" placeholder="Stock Quantity">
+<input id="image" placeholder="Image URL">
+<textarea id="description" placeholder="Product Description"></textarea>
+
+<button onclick="addProduct()">Save Product</button>
+
+<h2>All Products</h2>
+<div class="product-list" id="productList"></div>
+
+</div>
+
+<script>
+
+// LOAD EXISTING OR DEFAULT
+let products = JSON.parse(localStorage.getItem("dccv_products")) || [];
+
+// DISPLAY
+function displayProducts(){
+let list = document.getElementById("productList");
+list.innerHTML="";
+
+products.forEach((p,index)=>{
+list.innerHTML += `
+<div class="product">
+<b>${p.name}</b><br>
+${p.category} → ${p.subCategory}<br>
+₹${p.price} | Stock: ${p.stock}<br>
+<button onclick="editProduct(${index})">Edit</button>
+<button onclick="deleteProduct(${index})">Delete</button>
+</div>
+`;
+});
+}
+
+// ADD / UPDATE
+let editIndex = null;
+
+function addProduct(){
+
+let product = {
+name: document.getElementById("name").value,
+category: document.getElementById("category").value,
+subCategory: document.getElementById("subCategory").value,
+price: parseFloat(document.getElementById("price").value),
+discount: parseFloat(document.getElementById("discount").value) || 0,
+stock: parseInt(document.getElementById("stock").value),
+image: document.getElementById("image").value,
+description: document.getElementById("description").value
+};
+
+if(editIndex !== null){
+products[editIndex] = product;
+editIndex = null;
+}else{
+products.push(product);
+}
+
+// SAVE
+localStorage.setItem("dccv_products", JSON.stringify(products));
+
+clearForm();
+displayProducts();
+
+alert("Saved!");
+}
+
+// EDIT
+function editProduct(i){
+let p = products[i];
+
+document.getElementById("name").value = p.name;
+document.getElementById("category").value = p.category;
+document.getElementById("subCategory").value = p.subCategory;
+document.getElementById("price").value = p.price;
+document.getElementById("discount").value = p.discount;
+document.getElementById("stock").value = p.stock;
+document.getElementById("image").value = p.image;
+document.getElementById("description").value = p.description;
+
+editIndex = i;
+}
+
+// DELETE
+function deleteProduct(i){
+if(confirm("Delete this product?")){
+products.splice(i,1);
+localStorage.setItem("dccv_products", JSON.stringify(products));
+displayProducts();
+}
+}
+
+// CLEAR FORM
+function clearForm(){
+document.querySelectorAll("input,textarea").forEach(e=>e.value="");
+}
+
+// INIT
+displayProducts();
+
+</script>
+
+</body>
+</html>
