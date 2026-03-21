@@ -53,6 +53,19 @@ padding:10px;
 margin:10px 0;
 border-radius:5px;
 }
+
+.offer-tag{
+color:#00ffcc;
+font-weight:bold;
+}
+
+img.preview{
+width:100%;
+max-height:150px;
+object-fit:cover;
+border-radius:5px;
+margin-top:5px;
+}
 </style>
 </head>
 
@@ -70,8 +83,16 @@ border-radius:5px;
 <input id="price" type="number" placeholder="Price">
 <input id="discount" type="number" placeholder="Discount %">
 <input id="stock" type="number" placeholder="Stock Quantity">
-<input id="image" placeholder="Image URL">
+<input id="image" placeholder="Image URL" oninput="previewImage()">
 <textarea id="description" placeholder="Product Description"></textarea>
+
+<!-- NEW: OFFER TOGGLE -->
+<label style="display:block; margin-top:10px;">
+<input type="checkbox" id="isOffer"> Mark as Offer 🔥
+</label>
+
+<!-- IMAGE PREVIEW -->
+<img id="imgPreview" class="preview" src="" style="display:none;">
 
 <button onclick="addProduct()">Save Product</button>
 
@@ -91,84 +112,8 @@ let list = document.getElementById("productList");
 list.innerHTML="";
 
 products.forEach((p,index)=>{
+
+let finalPrice = p.discount ? (p.price - (p.price * p.discount / 100)) : p.price;
+
 list.innerHTML += `
-<div class="product">
-<b>${p.name}</b><br>
-${p.category} → ${p.subCategory}<br>
-₹${p.price} | Stock: ${p.stock}<br>
-<button onclick="editProduct(${index})">Edit</button>
-<button onclick="deleteProduct(${index})">Delete</button>
-</div>
-`;
-});
-}
-
-// ADD / UPDATE
-let editIndex = null;
-
-function addProduct(){
-
-let product = {
-name: document.getElementById("name").value,
-category: document.getElementById("category").value,
-subCategory: document.getElementById("subCategory").value,
-price: parseFloat(document.getElementById("price").value),
-discount: parseFloat(document.getElementById("discount").value) || 0,
-stock: parseInt(document.getElementById("stock").value),
-image: document.getElementById("image").value,
-description: document.getElementById("description").value
-};
-
-if(editIndex !== null){
-products[editIndex] = product;
-editIndex = null;
-}else{
-products.push(product);
-}
-
-// SAVE
-localStorage.setItem("dccv_products", JSON.stringify(products));
-
-clearForm();
-displayProducts();
-
-alert("Saved!");
-}
-
-// EDIT
-function editProduct(i){
-let p = products[i];
-
-document.getElementById("name").value = p.name;
-document.getElementById("category").value = p.category;
-document.getElementById("subCategory").value = p.subCategory;
-document.getElementById("price").value = p.price;
-document.getElementById("discount").value = p.discount;
-document.getElementById("stock").value = p.stock;
-document.getElementById("image").value = p.image;
-document.getElementById("description").value = p.description;
-
-editIndex = i;
-}
-
-// DELETE
-function deleteProduct(i){
-if(confirm("Delete this product?")){
-products.splice(i,1);
-localStorage.setItem("dccv_products", JSON.stringify(products));
-displayProducts();
-}
-}
-
-// CLEAR FORM
-function clearForm(){
-document.querySelectorAll("input,textarea").forEach(e=>e.value="");
-}
-
-// INIT
-displayProducts();
-
-</script>
-
-</body>
-</html>
+<div
