@@ -33,6 +33,27 @@ cursor:pointer;
 border-radius:5px;
 }
 
+/* OFFER ZONE */
+#offerZone{
+padding:20px;
+background:#111;
+}
+
+.offer-card{
+min-width:250px;
+background:#000;
+padding:10px;
+border:2px solid #00ffcc;
+border-radius:10px;
+}
+
+.offer-card img{
+width:100%;
+height:150px;
+object-fit:cover;
+border-radius:8px;
+}
+
 /* SEARCH */
 .search-box{
 padding:10px;
@@ -67,6 +88,18 @@ padding:20px;
 background:#111;
 padding:15px;
 border-radius:10px;
+}
+
+.card img{
+width:100%;
+height:150px;
+object-fit:cover;
+border-radius:8px;
+}
+
+.offer-badge{
+color:#00ffcc;
+font-weight:bold;
 }
 
 button{
@@ -110,6 +143,12 @@ margin:5px;
 <h1>DCCV CONSTRUCTION MATERIAL STORE</h1>
 <div class="admin-btn" onclick="goAdmin()">Admin Panel</div>
 </header>
+
+<!-- OFFER ZONE -->
+<div id="offerZone">
+<h2 style="color:#00ffcc;">🔥 Special Offers</h2>
+<div id="offerList" style="display:flex; gap:20px; overflow:auto;"></div>
+</div>
 
 <!-- SEARCH -->
 <div class="search-box">
@@ -159,15 +198,15 @@ margin:5px;
 
 <script>
 
-// PRODUCTS WITH CATEGORY
+// PRODUCTS
 let allProducts = [
-{name:"Fly Ash Brick",category:"Bricks",subCategory:"Standard",price:7,stock:5000},
-{name:"River Sand",category:"Sand",subCategory:"Natural",price:60,stock:1200},
-{name:"M Sand",category:"Sand",subCategory:"Manufactured",price:55,stock:900},
-{name:"20mm Aggregate",category:"Stone",subCategory:"Aggregate",price:78,stock:750},
-{name:"UltraTech OPC 53",category:"Cement",subCategory:"OPC",price:440,stock:180},
-{name:"Ambuja PPC",category:"Cement",subCategory:"PPC",price:395,stock:220},
-{name:"TMT Steel Rod",category:"Steel",subCategory:"TMT",price:70,stock:300}
+{name:"Fly Ash Brick",category:"Bricks",subCategory:"Standard",price:7,stock:5000,image:"https://via.placeholder.com/200",description:"High quality bricks"},
+{name:"River Sand",category:"Sand",subCategory:"Natural",price:60,stock:1200,image:"https://via.placeholder.com/200",description:"Clean natural sand"},
+{name:"M Sand",category:"Sand",subCategory:"Manufactured",price:55,stock:900,image:"https://via.placeholder.com/200",description:"Crushed sand"},
+{name:"20mm Aggregate",category:"Stone",subCategory:"Aggregate",price:78,stock:750,image:"https://via.placeholder.com/200",description:"Strong aggregates"},
+{name:"UltraTech OPC 53",category:"Cement",subCategory:"OPC",price:440,stock:180,image:"https://via.placeholder.com/200",description:"Premium cement"},
+{name:"Ambuja PPC",category:"Cement",subCategory:"PPC",price:395,stock:220,image:"https://via.placeholder.com/200",description:"Durable cement"},
+{name:"TMT Steel Rod",category:"Steel",subCategory:"TMT",price:70,stock:300,image:"https://via.placeholder.com/200",description:"High strength steel"}
 ];
 
 let cartItems=[];
@@ -175,7 +214,7 @@ let total=0;
 
 const productList=document.getElementById("productList");
 
-// LOAD FILTERS
+// FILTER LOAD
 function loadFilters(){
 let cats=[...new Set(allProducts.map(p=>p.category))];
 cats.forEach(c=>{
@@ -183,18 +222,22 @@ categoryFilter.innerHTML+=`<option value="${c}">${c}</option>`;
 });
 }
 
-// DISPLAY
+// DISPLAY PRODUCTS
 function displayProducts(list){
 productList.innerHTML="";
+
 list.forEach((p,i)=>{
 productList.innerHTML+=`
 <div class="card">
+${p.isOffer ? '<div class="offer-badge">🔥 OFFER</div>' : ''}
+
+<img src="${p.image}">
 <h3>${p.name}</h3>
+<p>${p.description}</p>
 <p>₹${p.price}</p>
 <p>Stock: ${p.stock}</p>
 
 <input type="number" id="qty${i}" placeholder="Qty">
-
 <button onclick="addToCart(${i})">Add</button>
 </div>`;
 });
@@ -219,7 +262,7 @@ let f=allProducts.filter(p=>
 displayProducts(f);
 }
 
-// ADD CART
+// CART
 function addToCart(i){
 let p=allProducts[i];
 let qty=parseInt(document.getElementById("qty"+i).value);
@@ -250,13 +293,32 @@ document.getElementById("total").innerText=total;
 cartItems.push({name:p.name,qty:qty,price:itemTotal});
 }
 
+// OFFER LOAD
+function loadOffers(){
+let offers = JSON.parse(localStorage.getItem("offers")) || [];
+
+let offerList = document.getElementById("offerList");
+offerList.innerHTML = "";
+
+offers.forEach(o=>{
+offerList.innerHTML += `
+<div class="offer-card">
+<img src="${o.image}">
+<h3>${o.name}</h3>
+<p>${o.description}</p>
+<p style="color:#f4b400;">₹${o.price}</p>
+</div>
+`;
+});
+}
+
 // UPI
 function payUPI(){
 let amt=document.getElementById("total").innerText;
 window.location=`upi://pay?pa=deychoudhurybinit@oksbi&pn=DCCV&am=${amt}&cu=INR`;
 }
 
-// WHATSAPP ORDER
+// WHATSAPP
 function placeOrder(){
 let name=document.getElementById("name").value;
 let phone=document.getElementById("phone").value;
@@ -273,7 +335,7 @@ msg+="\nTotal ₹"+total+"\nLocation:"+loc;
 window.open("https://wa.me/918402933354?text="+encodeURIComponent(msg));
 }
 
-// INVOICE
+// PDF
 function downloadInvoice(){
 const { jsPDF } = window.jspdf;
 let doc=new jsPDF();
@@ -301,6 +363,7 @@ window.location="admin-material.html";
 // INIT
 loadFilters();
 displayProducts(allProducts);
+loadOffers();
 
 </script>
 
