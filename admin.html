@@ -84,46 +84,47 @@ margin:20px auto;
 
 <script type="module">
 
+// 🔥 FIREBASE IMPORTS
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, collection, getDocs } 
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } 
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-// 🔥 YOUR FIREBASE CONFIG
+// 🔥 PASTE YOUR REAL CONFIG HERE
 const firebaseConfig = {
   apiKey: "YOUR_KEY",
   authDomain: "YOUR_DOMAIN",
   projectId: "YOUR_PROJECT_ID"
 };
 
+// INIT
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// LOGIN FUNCTION
+// 🔐 LOGIN
 window.adminLogin = async function(){
-
 let email = document.getElementById("email").value;
 let password = document.getElementById("password").value;
 
 try{
-  await signInWithEmailAndPassword(auth,email,password);
+await signInWithEmailAndPassword(auth,email,password);
 }catch(e){
-  alert("❌ Wrong admin login");
+alert("❌ Wrong Email or Password");
+}
 }
 
-}
-
-// LOGOUT FUNCTION
+// 🔐 LOGOUT
 window.logout = async function(){
 await signOut(auth);
 location.reload();
 }
 
-// CHECK AUTH
+// 🔐 AUTH CHECK
 onAuthStateChanged(auth, async (user) => {
 
-if(user && user.email === "admin@dccv.com"){
+if(user && user.email === "deychoudhurybinit@gmail.com"){
 
 document.getElementById("loginBox").style.display="none";
 document.getElementById("data").style.display="block";
@@ -134,11 +135,12 @@ loadData();
 }else{
 document.getElementById("loginBox").style.display="block";
 document.getElementById("data").style.display="none";
+document.getElementById("logoutBtn").style.display="none";
 }
 
 });
 
-// LOAD ALL LEADS
+// 📊 LOAD LEADS DATA
 async function loadData(){
 
 const querySnapshot = await getDocs(collection(db,"leads"));
