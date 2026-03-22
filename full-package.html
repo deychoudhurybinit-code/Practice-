@@ -79,7 +79,65 @@ border-radius:10px;
 
 <div class="container">
 
-<div class="grid" id="services"></div>
+<!-- SERVICES -->
+<div class="grid" id="services">
+
+<!-- STATIC DEFAULT SERVICES -->
+<div class="card">
+<img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e">
+<div class="card-content">
+<div class="icon">🏗️</div>
+<h3>A – Architecture</h3>
+<p>2D/3D Design, Vastu Planning</p>
+</div>
+</div>
+
+<div class="card">
+<img src="https://images.unsplash.com/photo-1504307651254-35680f356dfd">
+<div class="card-content">
+<div class="icon">🏢</div>
+<h3>B – Building Construction</h3>
+<p>Residential & Commercial Projects</p>
+</div>
+</div>
+
+<div class="card">
+<img src="https://images.unsplash.com/photo-1581092919534-6bcb1c0f7c1c">
+<div class="card-content">
+<div class="icon">🧱</div>
+<h3>C – Civil Engineering</h3>
+<p>Foundation & Structural Work</p>
+</div>
+</div>
+
+<div class="card">
+<img src="https://images.unsplash.com/photo-1505691723518-36a5ac3be353">
+<div class="card-content">
+<div class="icon">🎨</div>
+<h3>I – Interior Design</h3>
+<p>Modern Interiors & Modular Kitchen</p>
+</div>
+</div>
+
+<div class="card">
+<img src="https://images.unsplash.com/photo-1590658268037-6bf12165a8df">
+<div class="card-content">
+<div class="icon">👷</div>
+<h3>L – Labour Supply</h3>
+<p>Skilled Labour | 10–20% Cost Saving</p>
+</div>
+</div>
+
+<div class="card">
+<img src="https://images.unsplash.com/photo-1597002974029-1c2c48e0d7f3">
+<div class="card-content">
+<div class="icon">⚙️</div>
+<h3>M – Machinery Rental</h3>
+<p>Advanced Construction Equipment</p>
+</div>
+</div>
+
+</div>
 
 <!-- LEAD FORM -->
 <div class="form-box">
@@ -93,22 +151,21 @@ border-radius:10px;
 <!-- ADMIN PANEL -->
 <div class="admin" id="adminPanel">
 <h2>⚙️ Admin Panel</h2>
-<input type="text" id="title" placeholder="Service Title (A - Architecture)">
+<input type="text" id="title" placeholder="Service Title">
 <input type="text" id="desc" placeholder="Description">
 <input type="text" id="img" placeholder="Image URL">
-<input type="text" id="icon" placeholder="Icon (emoji)">
+<input type="text" id="icon" placeholder="Icon">
 <button onclick="addService()">Add Service</button>
 </div>
 
 </div>
 
-<!-- FIREBASE v10 -->
+<!-- FIREBASE -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// 🔥 CONFIG
 const firebaseConfig = {
   apiKey: "YOUR_API_KEY",
   authDomain: "YOUR_PROJECT.firebaseapp.com",
@@ -117,87 +174,77 @@ const firebaseConfig = {
 
 const WHATSAPP_NUMBER = "91XXXXXXXXXX";
 
-// INIT
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
 // LOGIN
 window.login = async function(){
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
+  const email = email.value;
+  const password = password.value;
 
   try{
     await signInWithEmailAndPassword(auth, email, password);
     alert("Login Success");
-  }catch(e){
+  }catch{
     alert("Login Failed");
   }
-}
+};
 
-// AUTH STATE
-onAuthStateChanged(auth, (user)=>{
+// SHOW ADMIN
+onAuthStateChanged(auth,(user)=>{
   if(user){
-    document.getElementById("adminPanel").style.display="block";
-    document.getElementById("loginBox").style.display="none";
+    adminPanel.style.display="block";
+    loginBox.style.display="none";
   }
 });
 
-// LOAD SERVICES
-const container = document.getElementById("services");
-
+// LOAD DYNAMIC SERVICES
 async function loadServices(){
-  container.innerHTML="";
+  const container = document.getElementById("services");
+
   const querySnapshot = await getDocs(collection(db,"services"));
-  
   querySnapshot.forEach(doc=>{
     const s = doc.data();
+
     container.innerHTML += `
     <div class="card">
-      <img src="${s.img}">
+      <img src="${s.img || 'https://via.placeholder.com/300'}">
       <div class="card-content">
-        <div class="icon">${s.icon}</div>
+        <div class="icon">${s.icon || '🏗️'}</div>
         <h3>${s.title}</h3>
         <p>${s.desc}</p>
       </div>
     </div>`;
   });
 }
-
 loadServices();
 
 // ADD SERVICE
 window.addService = async function(){
-  const title=document.getElementById("title").value;
-  const desc=document.getElementById("desc").value;
-  const img=document.getElementById("img").value;
-  const icon=document.getElementById("icon").value;
-
   await addDoc(collection(db,"services"),{
-    title,desc,img,icon
+    title:title.value,
+    desc:desc.value,
+    img:img.value,
+    icon:icon.value
   });
 
-  alert("Service Added");
-  loadServices();
-}
+  alert("Added");
+  location.reload();
+};
 
-// WHATSAPP LEAD
+// WHATSAPP
 window.submitLead = async function(){
-  const name=document.getElementById("name").value;
-  const phone=document.getElementById("phone").value;
-  const message=document.getElementById("message").value;
+  let text = `New Lead:%0AName: ${name.value}%0APhone: ${phone.value}%0ARequirement: ${message.value}`;
+  window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${text}`);
 
-  const text = `New Lead:%0AName: ${name}%0APhone: ${phone}%0ARequirement: ${message}`;
-  const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${text}`;
-
-  // Open WhatsApp
-  window.open(url, "_blank");
-
-  // Save to DB
   await addDoc(collection(db,"leads"),{
-    name,phone,message,date:new Date()
+    name:name.value,
+    phone:phone.value,
+    message:message.value,
+    date:new Date()
   });
-}
+};
 </script>
 
 </body>
