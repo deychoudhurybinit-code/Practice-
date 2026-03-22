@@ -215,12 +215,6 @@ font-weight:bold;
 </nav>
 </header>
 
-<!-- LOGIN BUTTON -->
-<button onclick="openAuth()" style="position:fixed;top:20px;right:20px;background:#f4b400;border:none;padding:10px;border-radius:5px;font-weight:bold;cursor:pointer;">Login</button>
-
-<!-- LOGOUT BUTTON -->
-<button onclick="logoutUser()" id="logoutBtn" style="position:fixed;top:20px;right:100px;background:red;border:none;padding:10px;border-radius:5px;font-weight:bold;cursor:pointer;display:none;">Logout</button>
-
 <section id="hero">
 <h2>DEY CHOUDHURY CONSTRUCTION VENTURES</h2>
 <p><b>YOUR ONE-STOP CONSTRUCTION SOLUTION</b></p>
@@ -281,6 +275,11 @@ interior design and paints.
 <button onclick="sendQuote()">Send Quote Request</button>
 </div>
 
+<!-- ✅ LOGIN MOVED HERE -->
+<br><br>
+<button onclick="openAuth()" style="background:#f4b400;border:none;padding:10px;border-radius:5px;font-weight:bold;">Login</button>
+<button onclick="logoutUser()" id="logoutBtn" style="background:red;border:none;padding:10px;border-radius:5px;font-weight:bold;display:none;">Logout</button>
+
 </section>
 
 <section id="contact">
@@ -315,7 +314,7 @@ interior design and paints.
 
 <script>
 
-// CONFIG (UPDATED ✔ ONLY CHANGE)
+// CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyAMcxTpBPc8F3acHGsYRxPWyNa4iLOlHIM",
   authDomain: "dccv-construction.firebaseapp.com",
