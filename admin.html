@@ -3,168 +3,161 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DCCV Main Admin Panel</title>
+<title>DCCV Admin Panel</title>
 
 <style>
-body{
-background:#000;
-color:#fff;
-font-family:Arial;
-margin:0;
-padding:20px;
-}
-
-h1{
-text-align:center;
-color:#f4b400;
-}
+body{margin:0;font-family:Arial;background:#000;color:#fff;padding:20px;}
+h1{color:#f4b400;text-align:center;}
 
 .form-box{
 background:#111;
 padding:20px;
 border-radius:10px;
-max-width:400px;
-margin:40px auto;
-text-align:center;
+max-width:500px;
+margin:auto;
 }
 
-input{
-padding:10px;
+input,textarea{
+width:90%;
 margin:10px;
-width:80%;
+padding:10px;
 border:none;
 border-radius:5px;
 }
 
 button{
 padding:10px;
-background:#f4b400;
+margin:5px;
 border:none;
 cursor:pointer;
-width:50%;
 font-weight:bold;
 }
+
+.add{background:#f4b400;}
+.delete{background:red;color:#fff;}
 
 .card{
 background:#111;
 padding:15px;
-margin:15px 0;
+margin:10px;
 border-radius:10px;
-box-shadow:0 5px 15px rgba(0,0,0,0.5);
-}
-
-.card p{
-margin:5px 0;
-}
-
-#logoutBtn{
-display:block;
-margin:20px auto;
 }
 </style>
 </head>
 
 <body>
 
-<h1>👑 DCCV Main Admin Panel</h1>
+<h1>ADMIN PANEL</h1>
 
-<!-- LOGIN -->
-<div class="form-box" id="loginBox">
-<h2>Admin Login</h2>
-<input type="text" id="email" placeholder="Admin Email">
-<input type="password" id="password" placeholder="Password">
-<button onclick="adminLogin()">Login</button>
+<div class="form-box">
+<input id="title" placeholder="Service Title">
+<textarea id="desc" placeholder="Description"></textarea>
+<input id="price" placeholder="Price">
+
+<button class="add" onclick="addService()">Add Service</button>
 </div>
 
-<!-- LOGOUT -->
-<button id="logoutBtn" onclick="logout()" style="display:none;">Logout</button>
+<h2>All Services</h2>
+<div id="servicesList"></div>
 
-<!-- DATA -->
-<div id="data" style="display:none;"></div>
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
-<script type="module">
+<script>
 
-// 🔥 FIREBASE IMPORTS
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, getDocs } 
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } 
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-// 🔥 PASTE YOUR REAL CONFIG HERE
 const firebaseConfig = {
-  apiKey: "YOUR_KEY",
-  authDomain: "YOUR_DOMAIN",
-  projectId: "YOUR_PROJECT_ID"
+  apiKey: "AIzaSyAMcxTpBPc8F3acHGsYRxPWyNa4iLOlHIM",
+  authDomain: "dccv-construction.firebaseapp.com",
+  projectId: "dccv-construction"
 };
 
-// INIT
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
+firebase.initializeApp(firebaseConfig);
 
-// 🔐 LOGIN
-window.adminLogin = async function(){
-let email = document.getElementById("email").value;
-let password = document.getElementById("password").value;
+const auth = firebase.auth();
+const db = firebase.firestore();
 
-try{
-await signInWithEmailAndPassword(auth,email,password);
-}catch(e){
-alert("❌ Wrong Email or Password");
-}
+// 🔒 ADMIN PROTECTION
+auth.onAuthStateChanged(async user=>{
+
+if(!user){
+alert("Login required");
+window.location="index.html";
+return;
 }
 
-// 🔐 LOGOUT
-window.logout = async function(){
-await signOut(auth);
-location.reload();
+let doc=await db.collection("users").doc(user.uid).get();
+
+if(!doc.exists || doc.data().role!=="admin"){
+alert("Access denied");
+window.location="index.html";
 }
 
-// 🔐 AUTH CHECK
-onAuthStateChanged(auth, async (user) => {
-
-if(user && user.email === "deychoudhurybinit@gmail.com"){
-
-document.getElementById("loginBox").style.display="none";
-document.getElementById("data").style.display="block";
-document.getElementById("logoutBtn").style.display="block";
-
-loadData();
-
-}else{
-document.getElementById("loginBox").style.display="block";
-document.getElementById("data").style.display="none";
-document.getElementById("logoutBtn").style.display="none";
-}
+loadServices();
 
 });
 
-// 📊 LOAD LEADS DATA
-async function loadData(){
+// ➕ ADD SERVICE
+function addService(){
 
-const querySnapshot = await getDocs(collection(db,"leads"));
+let title=document.getElementById("title").value.trim();
+let desc=document.getElementById("desc").value.trim();
+let price=document.getElementById("price").value.trim();
 
-let container = document.getElementById("data");
-container.innerHTML = "";
+if(!title || !desc){
+alert("Fill all fields");
+return;
+}
 
-querySnapshot.forEach((doc)=>{
+db.collection("services").add({
+title:title,
+desc:desc,
+price:price,
+createdAt:new Date()
+});
 
-let d = doc.data();
+alert("Service Added");
 
-container.innerHTML += `
+document.getElementById("title").value="";
+document.getElementById("desc").value="";
+document.getElementById("price").value="";
+}
+
+// 📦 LOAD SERVICES
+function loadServices(){
+
+db.collection("services").orderBy("createdAt","desc")
+.onSnapshot(snapshot=>{
+
+let html="";
+
+snapshot.forEach(doc=>{
+
+let data=doc.data();
+
+html+=`
 <div class="card">
-<p><b>Name:</b> ${d.name}</p>
-<p><b>Phone:</b> ${d.phone}</p>
-<p><b>Service:</b> ${d.service}</p>
-<p><b>Area:</b> ${d.area}</p>
-<p><b>Details:</b> ${d.details}</p>
-<p><b>Category:</b> ${d.category}</p>
+<h3>${data.title}</h3>
+<p>${data.desc}</p>
+<p><b>${data.price}</b></p>
+<button class="delete" onclick="deleteService('${doc.id}')">Delete</button>
 </div>
 `;
 
 });
 
+document.getElementById("servicesList").innerHTML=html;
+
+});
+
+}
+
+// ❌ DELETE
+function deleteService(id){
+if(confirm("Delete this service?")){
+db.collection("services").doc(id).delete();
+}
 }
 
 </script>
