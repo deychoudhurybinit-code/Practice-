@@ -254,4 +254,151 @@ interior design and paints.
 <a href="machinery-rent.html"><div class="service"><h3>🚜 Machinery Rent</h3></div></a>
 <a href="real-estate.html"><div class="service"><h3>🏘 Real Estate</h3></div></a>
 <a href="fabrication.html"><div class="service"><h3>⚙️ Fabrication</h3></div></a>
-<a href="full-package.html"><div class="service"><h3>
+<a href="full-package.html"><div class="service"><h3>🏢 A TO Z (FULL PACKAGE)</h3></div></a>
+</div>
+</section>
+
+<section id="gallery">
+<h2>Project Gallery</h2>
+
+<div class="gallery">
+<img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e">
+<img src="https://images.unsplash.com/photo-1504307651254-35680f356dfd">
+<img src="https://images.unsplash.com/photo-1599423300746-b62533397364">
+<img src="https://images.unsplash.com/photo-1570129477492-45c003edd2be">
+</div>
+</section>
+
+<section id="quote">
+<h2>Request a Quote</h2>
+
+<div class="form-box">
+<input type="text" id="qname" placeholder="Your Name">
+<input type="text" id="qphone" placeholder="Phone Number">
+<input type="text" id="qservice" placeholder="Service Needed">
+<input type="text" id="qarea" placeholder="Project Area (sq ft)">
+<textarea id="qdetails" placeholder="Project Details"></textarea>
+<button onclick="sendQuote()">Send Quote Request</button>
+</div>
+
+</section>
+
+<section id="contact">
+<h2>Our Location</h2>
+<iframe src="https://maps.google.com/maps?q=Silchar%20Assam&t=&z=14&ie=UTF8&iwloc=&output=embed"></iframe>
+</section>
+
+<footer>
+<p>© 2026 DEY CHOUDHURY CONSTRUCTION VENTURES (DCCV)</p>
+<p><a href="admin.html" style="color:#f4b400">Admin Panel</a></p>
+</footer>
+
+<a class="whatsapp" href="https://wa.me/918402933354">WhatsApp</a>
+<a class="youtube" href="https://youtube.com/@dc-construction-ventures?si=qLpOPZ3sOTamHZX2" target="_blank">▶</a>
+
+<!-- AUTH BOX -->
+<div id="authBox" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#111;padding:25px;border-radius:10px;display:none;z-index:999;width:300px;text-align:center;">
+<h3 id="authTitle">Login</h3>
+<input type="text" id="authName" placeholder="Name" style="display:none;">
+<input type="email" id="authEmail" placeholder="Email">
+<input type="password" id="authPassword" placeholder="Password">
+<button onclick="loginUser()">Login</button>
+<button onclick="signupUser()">Signup</button>
+<button onclick="closeAuth()">Close</button>
+<p onclick="toggleAuth()" style="color:#f4b400;cursor:pointer;">Create new account</p>
+</div>
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<script>
+
+// CONFIG
+const firebaseConfig = {
+  apiKey: "YOUR-API-KEY",
+  authDomain: "YOUR-PROJECT.firebaseapp.com",
+  projectId: "YOUR-PROJECT-ID"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// UI
+function openAuth(){ document.getElementById("authBox").style.display="block"; }
+function closeAuth(){ document.getElementById("authBox").style.display="none"; }
+
+let isLogin=true;
+
+function toggleAuth(){
+isLogin=!isLogin;
+document.getElementById("authTitle").innerText=isLogin?"Login":"Signup";
+document.getElementById("authName").style.display=isLogin?"none":"block";
+}
+
+// SIGNUP
+function signupUser(){
+let name=document.getElementById("authName").value;
+let email=document.getElementById("authEmail").value;
+let pass=document.getElementById("authPassword").value;
+
+auth.createUserWithEmailAndPassword(email,pass)
+.then(user=>{
+db.collection("users").doc(user.user.uid).set({name,email});
+alert("Signup success");
+closeAuth();
+})
+.catch(e=>alert(e.message));
+}
+
+// LOGIN
+function loginUser(){
+let email=document.getElementById("authEmail").value;
+let pass=document.getElementById("authPassword").value;
+
+auth.signInWithEmailAndPassword(email,pass)
+.then(()=>{
+alert("Login success");
+closeAuth();
+})
+.catch(e=>alert(e.message));
+}
+
+// LOGOUT
+function logoutUser(){
+auth.signOut();
+}
+
+// STATE
+auth.onAuthStateChanged(user=>{
+document.getElementById("logoutBtn").style.display=user?"block":"none";
+});
+
+// ORIGINAL FUNCTION
+function sendQuote(){
+
+let name=document.getElementById("qname").value;
+let phone=document.getElementById("qphone").value;
+let service=document.getElementById("qservice").value;
+let area=document.getElementById("qarea").value;
+let details=document.getElementById("qdetails").value;
+
+let message =
+"DCCV QUOTE REQUEST %0A%0A"+
+"Name: "+name+"%0A"+
+"Phone: "+phone+"%0A"+
+"Service: "+service+"%0A"+
+"Area: "+area+" sq ft%0A"+
+"Details: "+details;
+
+window.open("https://wa.me/918402933354?text="+message);
+
+}
+
+</script>
+
+</body>
+</html>
