@@ -1,29 +1,29 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hardware Admin | DCCV</title>
 
 <style>
 body{
-background:#000;
-color:white;
-font-family:Arial;
-padding:20px;
+  background:#000;
+  color:white;
+  font-family:Arial;
+  padding:20px;
 }
-
 input, select{
-display:block;
-margin:10px 0;
-padding:10px;
-width:300px;
+  display:block;
+  margin:10px 0;
+  padding:10px;
+  width:300px;
 }
-
 button{
-padding:10px 20px;
-background:#0b1f3a;
-color:white;
-border:none;
-cursor:pointer;
+  padding:10px 20px;
+  background:#0b1f3a;
+  color:white;
+  border:none;
+  cursor:pointer;
 }
 </style>
 </head>
@@ -45,47 +45,57 @@ cursor:pointer;
 <button onclick="uploadProduct()">Upload Product</button>
 
 <!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js"></script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
-<script>
 const firebaseConfig = {
-apiKey: "YOUR_KEY",
-authDomain: "YOUR_DOMAIN",
-projectId: "YOUR_ID",
-storageBucket: "YOUR_BUCKET",
+  apiKey: "YOUR_KEY",
+  authDomain: "YOUR_DOMAIN",
+  projectId: "YOUR_ID",
+  storageBucket: "YOUR_BUCKET",
 };
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const storage = firebase.storage();
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const storage = getStorage(app);
 
 async function uploadProduct(){
+  const fileInput = document.getElementById("image");
+  if(fileInput.files.length === 0){
+    alert("Please select an image");
+    return;
+  }
 
-let file = document.getElementById("image").files[0];
+  const file = fileInput.files[0];
+  const storageRef = ref(storage, "hardware/" + Date.now() + "_" + file.name);
 
-let storageRef = storage.ref("hardware/" + file.name);
-await storageRef.put(file);
+  // Upload image
+  await uploadBytes(storageRef, file);
+  const imageURL = await getDownloadURL(storageRef);
 
-let imageURL = await storageRef.getDownloadURL();
+  // Save product to Firestore
+  await addDoc(collection(db, "hardware"), {
+    name: document.getElementById("name").value,
+    category: document.getElementById("category").value,
+    subCategory: document.getElementById("subCategory").value,
+    size: document.getElementById("size").value,
+    price: Number(document.getElementById("price").value),
+    discount: Number(document.getElementById("discount").value),
+    quantity: Number(document.getElementById("quantity").value),
+    description: document.getElementById("description").value,
+    image: imageURL,
+    createdAt: new Date()
+  });
 
-await db.collection("hardware").add({
-name: document.getElementById("name").value,
-category: document.getElementById("category").value,
-subCategory: document.getElementById("subCategory").value,
-size: document.getElementById("size").value,
-price: Number(document.getElementById("price").value),
-discount: Number(document.getElementById("discount").value),
-quantity: Number(document.getElementById("quantity").value),
-description: document.getElementById("description").value,
-image: imageURL
-});
+  alert("Product Uploaded ✅");
 
-alert("Product Uploaded ✅");
+  // Clear form
+  document.querySelectorAll('input, textarea').forEach(i => i.value = "");
+  fileInput.value = "";
 }
 </script>
-s
 
 </body>
 </html>
