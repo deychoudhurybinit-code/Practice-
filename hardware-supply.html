@@ -132,7 +132,7 @@ margin:0 10px;
 
 <header>
 DCCV Hardware Supply
-<div class="admin-btn" onclick="goAdmin()">Admin Panel</div>
+<div class="admin-btn" id="adminBtn">Admin Panel</div>
 </header>
 
 <div class="filters">
@@ -174,7 +174,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { getFirestore, collection, onSnapshot, query } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
 
-// ✅ Your Firebase config
+// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyAMcxTpBPc8F3acHGsYRxPWyNa4iLOlHIM",
   authDomain: "dccv-construction.firebaseapp.com",
@@ -336,10 +336,10 @@ function placeOrder(){
   updateCart();
 }
 
-// NAVIGATE TO ADMIN
-window.goAdmin = function(){ 
-  window.location.href="admin-hardware.html"; 
-};
+// 🔹 FIX: Admin Panel Button
+document.getElementById("adminBtn").addEventListener("click", () => {
+    window.location.href = "admin-hardware.html";
+});
 
 </script>
 
