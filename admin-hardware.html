@@ -51,16 +51,23 @@ button{
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
 
-// ✅ Replace with your Firebase config
+// ✅ Your Firebase config
 const firebaseConfig = {
-  apiKey: "YOUR_KEY",
-  authDomain: "YOUR_DOMAIN",
-  projectId: "YOUR_ID",
-  storageBucket: "YOUR_BUCKET",
+  apiKey: "AIzaSyAMcxTpBPc8F3acHGsYRxPWyNa4iLOlHIM",
+  authDomain: "dccv-construction.firebaseapp.com",
+  databaseURL: "https://dccv-construction-default-rtdb.firebaseio.com",
+  projectId: "dccv-construction",
+  storageBucket: "dccv-construction.firebasestorage.app",
+  messagingSenderId: "897766209300",
+  appId: "1:897766209300:web:189fa70eb8033691ba3401",
+  measurementId: "G-W3MT4X1H88"
 };
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
@@ -85,12 +92,12 @@ async function uploadProduct(){
   }
 
   try{
-    // Upload image to Firebase Storage directly from phone/device
+    // Upload image to Firebase Storage
     const imageRef = ref(storage, "hardware/" + Date.now() + "_" + imageFile.name);
     await uploadBytes(imageRef, imageFile);
     const imageURL = await getDownloadURL(imageRef);
 
-    // Save product to Firestore WITHOUT createdAt
+    // Save product to Firestore (no createdAt)
     await addDoc(collection(db, "hardware"), {
       name,
       category,
