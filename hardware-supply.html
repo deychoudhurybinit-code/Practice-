@@ -171,16 +171,23 @@ DCCV Hardware Supply
 <!-- Firebase -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, collection, onSnapshot, query } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
 
+// ✅ Your Firebase config
 const firebaseConfig = {
-  apiKey: "YOUR_KEY",
-  authDomain: "YOUR_DOMAIN",
-  projectId: "YOUR_ID",
-  storageBucket: "YOUR_BUCKET",
+  apiKey: "AIzaSyAMcxTpBPc8F3acHGsYRxPWyNa4iLOlHIM",
+  authDomain: "dccv-construction.firebaseapp.com",
+  databaseURL: "https://dccv-construction-default-rtdb.firebaseio.com",
+  projectId: "dccv-construction",
+  storageBucket: "dccv-construction.firebasestorage.app",
+  messagingSenderId: "897766209300",
+  appId: "1:897766209300:web:189fa70eb8033691ba3401",
+  measurementId: "G-W3MT4X1H88"
 };
 
 const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 const db = getFirestore(app);
 
 let allProducts = [];
@@ -190,9 +197,9 @@ const productList = document.getElementById("productList");
 const categoryFilter = document.getElementById("categoryFilter");
 const subCategoryFilter = document.getElementById("subCategoryFilter");
 
-// FETCH PRODUCTS FROM FIRESTORE
+// 🔹 Fetch products dynamically from Firestore
 const hardwareRef = collection(db, "hardware");
-const q = query(hardwareRef, orderBy("createdAt","desc"));
+const q = query(hardwareRef);
 
 onSnapshot(q, snapshot=>{
   allProducts = [];
