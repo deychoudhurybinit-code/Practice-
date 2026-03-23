@@ -78,7 +78,7 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// 🔒 ADMIN PROTECTION
+// 🔒 ADMIN PROTECTION (EMAIL BASED)
 auth.onAuthStateChanged(async user=>{
 
 if(!user){
@@ -87,11 +87,16 @@ window.location="index.html";
 return;
 }
 
-let doc=await db.collection("users").doc(user.uid).get();
+// ✅ ONLY THESE EMAILS CAN ACCESS
+const allowedAdmins = [
+  "deychoudhurybinit@gmail.com",
+  "deychoudhuryconstructionventur@gmail.com"
+];
 
-if(!doc.exists || doc.data().role!=="admin"){
+if(!allowedAdmins.includes(user.email)){
 alert("Access denied");
 window.location="index.html";
+return;
 }
 
 loadServices();
