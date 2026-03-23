@@ -12,12 +12,14 @@ body{
   font-family:Arial;
   padding:20px;
 }
+
 input, select{
   display:block;
   margin:10px 0;
   padding:10px;
   width:300px;
 }
+
 button{
   padding:10px 20px;
   background:#0b1f3a;
@@ -47,9 +49,10 @@ button{
 <!-- Firebase -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
+// ✅ Replace these with your actual Firebase project config
 const firebaseConfig = {
   apiKey: "YOUR_KEY",
   authDomain: "YOUR_DOMAIN",
@@ -62,38 +65,57 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 
 async function uploadProduct(){
-  const fileInput = document.getElementById("image");
-  if(fileInput.files.length === 0){
-    alert("Please select an image");
+  // Get input values
+  const name = document.getElementById("name").value.trim();
+  const category = document.getElementById("category").value.trim();
+  const subCategory = document.getElementById("subCategory").value.trim();
+  const size = document.getElementById("size").value.trim();
+  const price = Number(document.getElementById("price").value);
+  const discount = Number(document.getElementById("discount").value);
+  const quantity = Number(document.getElementById("quantity").value);
+  const description = document.getElementById("description").value.trim();
+  const imageFile = document.getElementById("image").files[0];
+
+  // Validation
+  if(!name || !category || !subCategory || !price || !quantity || !description){
+    alert("Please fill all required fields!");
+    return;
+  }
+  if(!imageFile){
+    alert("Please select an image file!");
     return;
   }
 
-  const file = fileInput.files[0];
-  const storageRef = ref(storage, "hardware/" + Date.now() + "_" + file.name);
+  try{
+    // Upload image to Firebase Storage
+    const imageRef = ref(storage, "hardware/" + Date.now() + "_" + imageFile.name);
+    await uploadBytes(imageRef, imageFile);
+    const imageURL = await getDownloadURL(imageRef);
 
-  // Upload image
-  await uploadBytes(storageRef, file);
-  const imageURL = await getDownloadURL(storageRef);
+    // Save product to Firestore
+    await addDoc(collection(db, "hardware"), {
+      name,
+      category,
+      subCategory,
+      size,
+      price,
+      discount,
+      quantity,
+      description,
+      image: imageURL,
+      createdAt: serverTimestamp()
+    });
 
-  // Save product to Firestore
-  await addDoc(collection(db, "hardware"), {
-    name: document.getElementById("name").value,
-    category: document.getElementById("category").value,
-    subCategory: document.getElementById("subCategory").value,
-    size: document.getElementById("size").value,
-    price: Number(document.getElementById("price").value),
-    discount: Number(document.getElementById("discount").value),
-    quantity: Number(document.getElementById("quantity").value),
-    description: document.getElementById("description").value,
-    image: imageURL,
-    createdAt: new Date()
-  });
+    alert("Product Uploaded ✅");
 
-  alert("Product Uploaded ✅");
+    // Clear inputs
+    document.querySelectorAll('input').forEach(i => i.value = "");
+    document.getElementById("image").value = "";
 
-  // Clear form
-  document.querySelectorAll('input, textarea').forEach(i => i.value = "");
-  fileInput.value = "";
+  } catch(error){
+    console.error(error);
+    alert("Error uploading product: " + error.message);
+  }
 }
 </script>
 
