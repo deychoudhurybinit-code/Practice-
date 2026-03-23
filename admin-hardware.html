@@ -13,7 +13,7 @@ body{
   padding:20px;
 }
 
-input, select{
+input{
   display:block;
   margin:10px 0;
   padding:10px;
@@ -46,32 +46,18 @@ button{
 
 <button onclick="uploadProduct()">Upload Product</button>
 
-<!-- Firebase -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+<!-- Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
-// ✅ Firebase config
-const firebaseConfig = {
-  apiKey: "AIzaSyAMcxTpBPc8F3acHGsYRxPWyNa4iLOlHIM",
-  authDomain: "dccv-construction.firebaseapp.com",
-  databaseURL: "https://dccv-construction-default-rtdb.firebaseio.com",
-  projectId: "dccv-construction",
-  storageBucket: "dccv-construction.firebasestorage.app",
-  messagingSenderId: "897766209300",
-  appId: "1:897766209300:web:189fa70eb8033691ba3401",
-  measurementId: "G-W3MT4X1H88"
-};
+<script>
+const SUPABASE_URL = "YOUR_PROJECT_URL";   // 🔥 Paste here
+const SUPABASE_KEY = "YOUR_ANON_KEY";     // 🔥 Paste here
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-const db = getFirestore(app);
-const storage = getStorage(app);
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// 🚀 Upload Function
 async function uploadProduct(){
+
   const name = document.getElementById("name").value.trim();
   const category = document.getElementById("category").value.trim();
   const subCategory = document.getElementById("subCategory").value.trim();
@@ -80,45 +66,61 @@ async function uploadProduct(){
   const discount = Number(document.getElementById("discount").value);
   const quantity = Number(document.getElementById("quantity").value);
   const description = document.getElementById("description").value.trim();
-  const imageFile = document.getElementById("image").files[0];
+  const file = document.getElementById("image").files[0];
 
-  if(!name || !category || !subCategory || !price || !quantity || !description){
-    alert("Please fill all required fields!");
+  if(!name || !category || !subCategory || !price || !quantity){
+    alert("Please fill required fields!");
     return;
   }
 
   try{
-    let imageURL = "";
-    if(imageFile){
-      // Upload image if selected
-      const imageRef = ref(storage, "hardware/" + Date.now() + "_" + imageFile.name);
-      await uploadBytes(imageRef, imageFile);
-      imageURL = await getDownloadURL(imageRef);
+
+    let image_url = "";
+
+    // 📤 Upload Image
+    if(file){
+      const fileName = Date.now() + "-" + file.name;
+
+      const { error: uploadError } = await supabaseClient.storage
+        .from("hardware")
+        .upload(fileName, file);
+
+      if(uploadError){
+        alert("Image upload failed!");
+        return;
+      }
+
+      image_url = `${SUPABASE_URL}/storage/v1/object/public/hardware/${fileName}`;
     }
 
-    // Save product to Firestore with createdAt
-    await addDoc(collection(db, "hardware"), {
-      name,
-      category,
-      subCategory,
-      size,
-      price,
-      discount,
-      quantity,
-      description,
-      image: imageURL,
-      createdAt: serverTimestamp()
-    });
+    // 📊 Save Product Data
+    const { error } = await supabaseClient
+      .from("hardware_items")
+      .insert([{
+        name,
+        category,
+        subCategory,
+        size,
+        price,
+        discount,
+        quantity,
+        description,
+        image: image_url
+      }]);
 
-    alert("Product Uploaded ✅");
+    if(error){
+      alert("Error saving product!");
+      console.log(error);
+      return;
+    }
 
-    // Clear inputs
-    document.querySelectorAll('input').forEach(i => i.value = "");
-    document.getElementById("image").value = "";
+    alert("Product Uploaded Successfully ✅");
 
-  } catch(error){
-    console.error(error);
-    alert("Error uploading product: " + error.message);
+    // 🔄 Clear Inputs
+    document.querySelectorAll("input").forEach(i => i.value="");
+
+  }catch(err){
+    alert("Error: " + err.message);
   }
 }
 </script>
