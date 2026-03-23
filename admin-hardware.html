@@ -49,11 +49,11 @@ button{
 <!-- Firebase -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
 
-// ✅ Your Firebase config
+// ✅ Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyAMcxTpBPc8F3acHGsYRxPWyNa4iLOlHIM",
   authDomain: "dccv-construction.firebaseapp.com",
@@ -86,18 +86,17 @@ async function uploadProduct(){
     alert("Please fill all required fields!");
     return;
   }
-  if(!imageFile){
-    alert("Please select an image file!");
-    return;
-  }
 
   try{
-    // Upload image to Firebase Storage
-    const imageRef = ref(storage, "hardware/" + Date.now() + "_" + imageFile.name);
-    await uploadBytes(imageRef, imageFile);
-    const imageURL = await getDownloadURL(imageRef);
+    let imageURL = "";
+    if(imageFile){
+      // Upload image if selected
+      const imageRef = ref(storage, "hardware/" + Date.now() + "_" + imageFile.name);
+      await uploadBytes(imageRef, imageFile);
+      imageURL = await getDownloadURL(imageRef);
+    }
 
-    // Save product to Firestore (no createdAt)
+    // Save product to Firestore with createdAt
     await addDoc(collection(db, "hardware"), {
       name,
       category,
@@ -107,7 +106,8 @@ async function uploadProduct(){
       discount,
       quantity,
       description,
-      image: imageURL
+      image: imageURL,
+      createdAt: serverTimestamp()
     });
 
     alert("Product Uploaded ✅");
