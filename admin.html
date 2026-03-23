@@ -6,41 +6,67 @@
 <title>DCCV Admin Panel</title>
 
 <style>
-body{margin:0;font-family:Arial;background:#000;color:#fff;padding:20px;}
-h1{color:#f4b400;text-align:center;}
-
-.form-box{
-background:#111;
-padding:20px;
-border-radius:10px;
-max-width:500px;
-margin:auto;
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #000;
+  color: #fff;
+  padding: 20px;
 }
 
-input,textarea{
-width:90%;
-margin:10px;
-padding:10px;
-border:none;
-border-radius:5px;
+h1 {
+  color: #f4b400;
+  text-align: center;
+  margin-bottom: 10px;
 }
 
-button{
-padding:10px;
-margin:5px;
-border:none;
-cursor:pointer;
-font-weight:bold;
+.nav-buttons {
+  text-align: center;
+  margin-bottom: 20px;
 }
 
-.add{background:#f4b400;}
-.delete{background:red;color:#fff;}
+.nav-buttons button {
+  padding: 10px 20px;
+  margin: 5px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  background: #f4b400;
+  color: #000;
+}
 
-.card{
-background:#111;
-padding:15px;
-margin:10px;
-border-radius:10px;
+.form-box {
+  background: #111;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 500px;
+  margin: auto;
+}
+
+input, textarea {
+  width: 90%;
+  margin: 10px 0;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+}
+
+button.add {
+  background: #f4b400;
+}
+
+button.delete {
+  background: red;
+  color: #fff;
+}
+
+.card {
+  background: #111;
+  padding: 15px;
+  margin: 10px auto;
+  border-radius: 10px;
+  max-width: 500px;
 }
 </style>
 </head>
@@ -49,15 +75,19 @@ border-radius:10px;
 
 <h1>ADMIN PANEL</h1>
 
-<div class="form-box">
-<input id="title" placeholder="Service Title">
-<textarea id="desc" placeholder="Description"></textarea>
-<input id="price" placeholder="Price">
-
-<button class="add" onclick="addService()">Add Service</button>
+<div class="nav-buttons">
+  <button onclick="window.location='admin-material.html'">Material Admin</button>
+  <button onclick="window.location='admin-hardware.html'">Hardware Admin</button>
 </div>
 
-<h2>All Services</h2>
+<div class="form-box">
+  <input id="title" placeholder="Service Title">
+  <textarea id="desc" placeholder="Description"></textarea>
+  <input id="price" placeholder="Price">
+  <button class="add" onclick="addService()">Add Service</button>
+</div>
+
+<h2 style="text-align:center;">All Services</h2>
 <div id="servicesList"></div>
 
 <!-- FIREBASE -->
@@ -66,7 +96,6 @@ border-radius:10px;
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
 <script>
-
 const firebaseConfig = {
   apiKey: "AIzaSyAMcxTpBPc8F3acHGsYRxPWyNa4iLOlHIM",
   authDomain: "dccv-construction.firebaseapp.com",
@@ -79,92 +108,78 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 // 🔒 ADMIN PROTECTION (EMAIL BASED)
-auth.onAuthStateChanged(async user=>{
+auth.onAuthStateChanged(async user => {
+  if(!user){
+    alert("Login required");
+    window.location = "index.html";
+    return;
+  }
 
-if(!user){
-alert("Login required");
-window.location="index.html";
-return;
-}
+  // ✅ ONLY THESE EMAILS CAN ACCESS
+  const allowedAdmins = [
+    "deychoudhurybinit@gmail.com",
+    "deychoudhuryconstructionventur@gmail.com"
+  ];
 
-// ✅ ONLY THESE EMAILS CAN ACCESS
-const allowedAdmins = [
-  "deychoudhurybinit@gmail.com",
-  "deychoudhuryconstructionventur@gmail.com"
-];
+  if(!allowedAdmins.includes(user.email)){
+    alert("Access denied");
+    window.location = "index.html";
+    return;
+  }
 
-if(!allowedAdmins.includes(user.email)){
-alert("Access denied");
-window.location="index.html";
-return;
-}
-
-loadServices();
-
+  loadServices();
 });
 
 // ➕ ADD SERVICE
-function addService(){
+function addService() {
+  let title = document.getElementById("title").value.trim();
+  let desc = document.getElementById("desc").value.trim();
+  let price = document.getElementById("price").value.trim();
 
-let title=document.getElementById("title").value.trim();
-let desc=document.getElementById("desc").value.trim();
-let price=document.getElementById("price").value.trim();
+  if(!title || !desc){
+    alert("Fill all fields");
+    return;
+  }
 
-if(!title || !desc){
-alert("Fill all fields");
-return;
-}
+  db.collection("services").add({
+    title: title,
+    desc: desc,
+    price: price,
+    createdAt: new Date()
+  });
 
-db.collection("services").add({
-title:title,
-desc:desc,
-price:price,
-createdAt:new Date()
-});
-
-alert("Service Added");
-
-document.getElementById("title").value="";
-document.getElementById("desc").value="";
-document.getElementById("price").value="";
+  alert("Service Added");
+  document.getElementById("title").value = "";
+  document.getElementById("desc").value = "";
+  document.getElementById("price").value = "";
 }
 
 // 📦 LOAD SERVICES
-function loadServices(){
-
-db.collection("services").orderBy("createdAt","desc")
-.onSnapshot(snapshot=>{
-
-let html="";
-
-snapshot.forEach(doc=>{
-
-let data=doc.data();
-
-html+=`
-<div class="card">
-<h3>${data.title}</h3>
-<p>${data.desc}</p>
-<p><b>${data.price}</b></p>
-<button class="delete" onclick="deleteService('${doc.id}')">Delete</button>
-</div>
-`;
-
-});
-
-document.getElementById("servicesList").innerHTML=html;
-
-});
-
+function loadServices() {
+  db.collection("services").orderBy("createdAt","desc")
+    .onSnapshot(snapshot => {
+      let html = "";
+      snapshot.forEach(doc => {
+        let data = doc.data();
+        html += `
+          <div class="card">
+            <h3>${data.title}</h3>
+            <p>${data.desc}</p>
+            <p><b>${data.price}</b></p>
+            <button class="delete" onclick="deleteService('${doc.id}')">Delete</button>
+          </div>
+        `;
+      });
+      document.getElementById("servicesList").innerHTML = html;
+    });
 }
 
 // ❌ DELETE
 function deleteService(id){
-if(confirm("Delete this service?")){
-db.collection("services").doc(id).delete();
+  if(confirm("Delete this service?")){
+    db.collection("services").doc(id).delete();
+  }
 }
-}
-
 </script>
 
 </body>
