@@ -154,7 +154,6 @@ font-weight:bold;
 
 <a href="#quote" class="hero-btn">Request a Quote</a>
 
-<!-- LOGIN BELOW FIRST REQUEST QUOTE -->
 <br><br>
 <button onclick="openAuth()" style="background:#f4b400;border:none;padding:10px;border-radius:5px;font-weight:bold;">Login</button>
 <button onclick="logoutUser()" id="logoutBtn" style="background:red;border:none;padding:10px;border-radius:5px;font-weight:bold;display:none;">Logout</button>
@@ -181,7 +180,12 @@ interior design and paints.
 <a href="architecture.html"><div class="service"><h3>🏠 Architecture</h3></div></a>
 <a href="labour-supply.html"><div class="service"><h3>👷 Labour Supply</h3></div></a>
 <a href="construction-materials.html"><div class="service"><h3>🧱 Construction Materials</h3></div></a>
-<a href="hardware-supply.html"><div class="service"><h3>🔧 Hardware Supply</h3></div></a>
+
+<!-- ✅ UPDATED LINK ONLY -->
+<a href="https://dey-choudhury-construction-ventures.store.shoopy.in" target="_blank">
+<div class="service"><h3>🔧 Hardware Supply</h3></div>
+</a>
+
 <a href="interior-design.html"><div class="service"><h3>🛋 Interior Design</h3></div></a>
 <a href="painting.html"><div class="service"><h3>🎨 Paints</h3></div></a>
 <a href="shuttering-rent.html"><div class="service"><h3>🧰 Shuttering Rent</h3></div></a>
@@ -229,7 +233,6 @@ interior design and paints.
 <a class="whatsapp" href="https://wa.me/918402933354">WhatsApp</a>
 <a class="youtube" href="https://youtube.com/@dc-construction-ventures?si=qLpOPZ3sOTamHZX2" target="_blank">▶</a>
 
-<!-- AUTH BOX -->
 <div id="authBox" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#111;padding:25px;border-radius:10px;display:none;z-index:999;width:300px;text-align:center;">
 <h3 id="authTitle">Login</h3>
 <input type="text" id="authName" placeholder="Name" style="display:none;">
@@ -241,7 +244,6 @@ interior design and paints.
 <p onclick="toggleAuth()" style="color:#f4b400;cursor:pointer;">Create new account</p>
 </div>
 
-<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -299,7 +301,6 @@ auth.onAuthStateChanged(user=>{
 logoutBtn.style.display=user?"block":"none";
 });
 
-// UPDATED QUOTE FORMAT
 function sendQuote(){
 
 let name=qname.value;
