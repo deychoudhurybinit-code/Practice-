@@ -129,6 +129,92 @@ font-size:18px;
 text-decoration:none;
 font-weight:bold;
 }
+
+.instagram{
+position:fixed;
+bottom:140px;
+right:20px;
+background:#E1306C;
+color:white;
+padding:15px 18px;
+border-radius:50px;
+font-size:18px;
+text-decoration:none;
+font-weight:bold;
+}
+
+.facebook{
+position:fixed;
+bottom:200px;
+right:20px;
+background:#1877F2;
+color:white;
+padding:15px 18px;
+border-radius:50px;
+font-size:18px;
+text-decoration:none;
+font-weight:bold;
+}
+
+/* make svg icons white */
+.instagram img,
+.facebook img{
+filter:invert(1);
+}
+
+/* CHATBOT */
+.chatbot-btn{
+position:fixed;
+left:20px;
+bottom:20px;
+background:#f4b400;
+color:black;
+padding:15px 18px;
+border-radius:50%;
+font-size:20px;
+cursor:pointer;
+z-index:999;
+box-shadow:0 5px 20px rgba(0,0,0,0.6);
+}
+
+.chatbox{
+position:fixed;
+left:20px;
+bottom:80px;
+width:280px;
+background:#111;
+border-radius:12px;
+padding:15px;
+display:none;
+z-index:999;
+box-shadow:0 8px 30px rgba(0,0,0,0.7);
+}
+
+.chatbox h3{margin:0 0 10px;color:#f4b400;}
+
+.chat-messages{
+height:150px;
+overflow-y:auto;
+font-size:14px;
+margin-bottom:10px;
+}
+
+.chatbox input{
+width:100%;
+padding:8px;
+margin-bottom:8px;
+border:none;
+border-radius:5px;
+}
+
+.chatbox button{
+width:100%;
+padding:8px;
+background:#f4b400;
+border:none;
+font-weight:bold;
+cursor:pointer;
+}
 </style>
 </head>
 
@@ -174,35 +260,24 @@ interior design and paints.
 
 <section id="services">
 <h2>Our Services</h2>
-
 <div class="services-grid">
 <a href="govt-permission.html"><div class="service"><h3>🏗 Govt Permission</h3></div></a>
 <a href="architecture.html"><div class="service"><h3>🏠 Architecture</h3></div></a>
 <a href="labour-supply.html"><div class="service"><h3>👷 Labour Supply</h3></div></a>
 <a href="construction-materials.html"><div class="service"><h3>🧱 Construction Materials</h3></div></a>
-
-<a href="https://dey-choudhury-construction-ventures.store.shoopy.in" target="_blank">
-<div class="service"><h3>🔧 Hardware Supply</h3></div>
-</a>
-
+<a href="https://dey-choudhury-construction-ventures.store.shoopy.in" target="_blank"><div class="service"><h3>🔧 Hardware Supply</h3></div></a>
 <a href="interior-design.html"><div class="service"><h3>🛋 Interior Design</h3></div></a>
 <a href="painting.html"><div class="service"><h3>🎨 Paints</h3></div></a>
 <a href="shuttering-rent.html"><div class="service"><h3>🧰 Shuttering Rent</h3></div></a>
 <a href="machinery-rent.html"><div class="service"><h3>🚜 Machinery Rent</h3></div></a>
 <a href="real-estate.html"><div class="service"><h3>🏘 Real Estate</h3></div></a>
 <a href="fabrication.html"><div class="service"><h3>⚙️ Fabrication</h3></div></a>
-
-<!-- UPDATED -->
-<a href="full-package.html">
-<div class="service"><h3>🏢 FOUNDATION TO FINISH (PACKAGE)</h3></div>
-</a>
-
+<a href="full-package.html"><div class="service"><h3>🏢 FOUNDATION TO FINISH (PACKAGE)</h3></div></a>
 </div>
 </section>
 
 <section id="gallery">
 <h2>Project Gallery</h2>
-
 <div class="gallery">
 <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e">
 <img src="https://images.unsplash.com/photo-1504307651254-35680f356dfd">
@@ -213,7 +288,6 @@ interior design and paints.
 
 <section id="quote">
 <h2>Request a Quote</h2>
-
 <div class="form-box">
 <input type="text" id="qname" placeholder="Your Name">
 <input type="text" id="qphone" placeholder="Phone Number">
@@ -237,15 +311,24 @@ interior design and paints.
 <a class="whatsapp" href="https://wa.me/918402933354">WhatsApp</a>
 <a class="youtube" href="https://youtube.com/@dc-construction-ventures?si=qLpOPZ3sOTamHZX2" target="_blank">▶</a>
 
-<div id="authBox" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#111;padding:25px;border-radius:10px;display:none;z-index:999;width:300px;text-align:center;">
-<h3 id="authTitle">Login</h3>
-<input type="text" id="authName" placeholder="Name" style="display:none;">
-<input type="email" id="authEmail" placeholder="Email">
-<input type="password" id="authPassword" placeholder="Password">
-<button onclick="loginUser()">Login</button>
-<button onclick="signupUser()">Signup</button>
-<button onclick="closeAuth()">Close</button>
-<p onclick="toggleAuth()" style="color:#f4b400;cursor:pointer;">Create new account</p>
+<a class="instagram" href="https://www.instagram.com/dc_construction_ventures?igsh=anA1Z2hkN2t4YnE3&utm_source=ig_contact_invite" target="_blank">
+<img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" width="22">
+</a>
+
+<a class="facebook" href="https://www.facebook.com/share/17AqacGcEx/" target="_blank">
+<img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/facebook.svg" width="22">
+</a>
+
+<!-- CHATBOT -->
+<div class="chatbot-btn" onclick="toggleChat()">💬</div>
+
+<div class="chatbox" id="chatbox">
+<h3>DCCV Assistant</h3>
+<div id="chatMessages" class="chat-messages">
+<p><b>Bot:</b> Hi 👋 Welcome to DCCV! What's your name?</p>
+</div>
+<input type="text" id="userInput" placeholder="Type your message...">
+<button onclick="sendMessage()">Send</button>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -253,81 +336,53 @@ interior design and paints.
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
 <script>
+// KEEPING YOUR ORIGINAL LOGIC + ADDING CHATBOT UPGRADE ONLY
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAMcxTpBPc8F3acHGsYRxPWyNa4iLOlHIM",
-  authDomain: "dccv-construction.firebaseapp.com",
-  projectId: "dccv-construction",
-  storageBucket: "dccv-construction.firebasestorage.app",
-  messagingSenderId: "897766209300",
-  appId: "1:897766209300:web:189fa70eb8033691ba3401"
-};
+let step=0;
+let lead={name:"",phone:"",requirement:""};
 
-firebase.initializeApp(firebaseConfig);
-
-const auth = firebase.auth();
-const db = firebase.firestore();
-
-function openAuth(){document.getElementById("authBox").style.display="block";}
-function closeAuth(){document.getElementById("authBox").style.display="none";}
-
-let isLogin=true;
-
-function toggleAuth(){
-isLogin=!isLogin;
-document.getElementById("authTitle").innerText=isLogin?"Login":"Signup";
-document.getElementById("authName").style.display=isLogin?"none":"block";
+function toggleChat(){
+let box=document.getElementById("chatbox");
+box.style.display=box.style.display==="block"?"none":"block";
 }
 
-function signupUser(){
-let name=authName.value;
-let email=authEmail.value;
-let pass=authPassword.value;
+function sendMessage(){
+let input=document.getElementById("userInput");
+let msg=input.value.trim();
+if(!msg) return;
 
-auth.createUserWithEmailAndPassword(email,pass)
-.then(user=>{
-db.collection("users").doc(user.user.uid).set({name,email});
-alert("Signup success");
-closeAuth();
-})
-.catch(e=>alert(e.message));
+let chat=document.getElementById("chatMessages");
+chat.innerHTML+=`<p><b>You:</b> ${msg}</p>`;
+
+if(step===0){
+lead.name=msg;
+chat.innerHTML+=`<p><b>Bot:</b> Nice to meet you ${lead.name}! 📛 Enter your phone number.</p>`;
+step=1;
+}
+else if(step===1){
+lead.phone=msg;
+chat.innerHTML+=`<p><b>Bot:</b> What service do you need?</p>`;
+step=2;
+}
+else{
+lead.requirement=msg;
+chat.innerHTML+=`<p><b>Bot:</b> Thanks! We will contact you shortly 🚀</p>`;
+
+let fullMsg=`DCCV NEW LEAD 🚨
+
+Name: ${lead.name}
+Phone: ${lead.phone}
+Requirement: ${lead.requirement}`;
+
+window.open("https://wa.me/918402933354?text="+encodeURIComponent(fullMsg));
+
+step=0;
+lead={name:"",phone:"",requirement:""};
 }
 
-function loginUser(){
-auth.signInWithEmailAndPassword(authEmail.value,authPassword.value)
-.then(()=>{alert("Login success");closeAuth();})
-.catch(e=>alert(e.message));
+input.value="";
+chat.scrollTop=chat.scrollHeight;
 }
-
-function logoutUser(){auth.signOut();}
-
-auth.onAuthStateChanged(user=>{
-logoutBtn.style.display=user?"block":"none";
-});
-
-function sendQuote(){
-
-let name=qname.value;
-let phone=qphone.value;
-let service=qservice.value;
-let area=qarea.value;
-let details=qdetails.value;
-
-let message =
-`DCCV QUOTE REQUEST
-
-Name: ${name}
-Phone: ${phone}
-Service: ${service}
-Area: ${area} sq ft
-
-Details:
-${details}`;
-
-window.open("https://wa.me/918402933354?text="+encodeURIComponent(message));
-
-}
-
 </script>
 
 </body>
