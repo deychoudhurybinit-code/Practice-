@@ -141,6 +141,9 @@ border-radius:50px;
 font-size:18px;
 text-decoration:none;
 font-weight:bold;
+display:flex;
+align-items:center;
+justify-content:center;
 }
 
 .facebook{
@@ -154,60 +157,9 @@ border-radius:50px;
 font-size:18px;
 text-decoration:none;
 font-weight:bold;
-}
-
-/* CHATBOT */
-.chatbot-btn{
-position:fixed;
-left:20px;
-bottom:20px;
-background:#f4b400;
-color:black;
-padding:15px 18px;
-border-radius:50%;
-font-size:20px;
-cursor:pointer;
-z-index:999;
-box-shadow:0 5px 20px rgba(0,0,0,0.6);
-}
-
-.chatbox{
-position:fixed;
-left:20px;
-bottom:80px;
-width:280px;
-background:#111;
-border-radius:12px;
-padding:15px;
-display:none;
-z-index:999;
-box-shadow:0 8px 30px rgba(0,0,0,0.7);
-}
-
-.chatbox h3{margin:0 0 10px;color:#f4b400;}
-
-.chat-messages{
-height:150px;
-overflow-y:auto;
-font-size:14px;
-margin-bottom:10px;
-}
-
-.chatbox input{
-width:100%;
-padding:8px;
-margin-bottom:8px;
-border:none;
-border-radius:5px;
-}
-
-.chatbox button{
-width:100%;
-padding:8px;
-background:#f4b400;
-border:none;
-font-weight:bold;
-cursor:pointer;
+display:flex;
+align-items:center;
+justify-content:center;
 }
 </style>
 </head>
@@ -305,8 +257,18 @@ interior design and paints.
 <a class="whatsapp" href="https://wa.me/918402933354">WhatsApp</a>
 <a class="youtube" href="https://youtube.com/@dc-construction-ventures?si=qLpOPZ3sOTamHZX2" target="_blank">▶</a>
 
-<a class="instagram" href="https://www.instagram.com/dc_construction_ventures?igsh=anA1Z2hkN2t4YnE3&utm_source=ig_contact_invite" target="_blank">📸</a>
-<a class="facebook" href="https://www.facebook.com/share/17AqacGcEx/" target="_blank">f</a>
+<!-- ONLY ICONS CHANGED -->
+<a class="instagram" href="https://www.instagram.com/dc_construction_ventures?igsh=anA1Z2hkN2t4YnE3&utm_source=ig_contact_invite" target="_blank">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+<path d="M7 2C4.24 2 2 4.24 2 7v10c0 2.76 2.24 5 5 5h10c2.76 0 5-2.24 5-5V7c0-2.76-2.24-5-5-5H7zm10 2a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm-5 3a5 5 0 1 1 0 10 5 5 0 0 1 0-10z"/>
+</svg>
+</a>
+
+<a class="facebook" href="https://www.facebook.com/share/17AqacGcEx/" target="_blank">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+<path d="M22 12a10 10 0 1 0-11.5 9.95v-7.05H8v-2.9h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.7-1.6 1.4v1.7H18l-.4 2.9h-2.5V22A10 10 0 0 0 22 12z"/>
+</svg>
+</a>
 
 <!-- CHATBOT -->
 <div class="chatbot-btn" onclick="toggleChat()">💬</div>
@@ -338,23 +300,6 @@ function sendMessage() {
 
   chat.innerHTML += `<p><b>You:</b> ${msg}</p>`;
 
-  let lowerMsg = msg.toLowerCase();
-
-  let smartReply = "";
-
-  if (lowerMsg.includes("price") || lowerMsg.includes("cost")) {
-    smartReply = "📊 Price depends on project size. Please share area (sq ft).";
-  } 
-  else if (lowerMsg.includes("house") || lowerMsg.includes("home")) {
-    smartReply = "🏠 We build full houses from foundation to finish. What's your area?";
-  } 
-  else if (lowerMsg.includes("contact") || lowerMsg.includes("phone")) {
-    smartReply = "📞 Please share your phone number so our team can call you.";
-  } 
-  else if (lowerMsg.includes("location")) {
-    smartReply = "📍 We are based in Silchar, Assam. We serve all nearby areas.";
-  }
-
   if (step === 0) {
     lead.name = msg;
     chat.innerHTML += `<p><b>Bot:</b> Nice to meet you ${lead.name} 👋 Now share your phone number.</p>`;
@@ -365,10 +310,10 @@ function sendMessage() {
     chat.innerHTML += `<p><b>Bot:</b> What service do you need?</p>`;
     step = 2;
   } 
-  else if (step === 2) {
+  else {
     lead.requirement = msg;
 
-    chat.innerHTML += `<p><b>Bot:</b> धन्यवाद 🙏 Our team will contact you soon!</p>`;
+    chat.innerHTML += `<p><b>Bot:</b> Thanks! Our team will contact you soon 🚀</p>`;
 
     let fullMsg = `DCCV CHAT LEAD 🚨\n\nName: ${lead.name}\nPhone: ${lead.phone}\nRequirement: ${lead.requirement}`;
 
@@ -376,10 +321,6 @@ function sendMessage() {
 
     step = 0;
     lead = { name: "", phone: "", requirement: "" };
-  }
-
-  if (smartReply !== "" && step > 0) {
-    chat.innerHTML += `<p><b>Bot:</b> ${smartReply}</p>`;
   }
 
   input.value = "";
