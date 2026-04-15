@@ -161,6 +161,42 @@ display:flex;
 align-items:center;
 justify-content:center;
 }
+
+/* ✅ CHATBOT FLOAT FIX */
+.chatbot-btn{
+position:fixed;
+bottom:20px;
+left:20px;
+background:#f4b400;
+color:black;
+padding:15px;
+border-radius:50%;
+cursor:pointer;
+font-size:18px;
+z-index:9999;
+}
+
+.chatbox{
+position:fixed;
+bottom:80px;
+left:20px;
+width:280px;
+background:#111;
+border-radius:10px;
+padding:10px;
+display:none;
+z-index:9999;
+box-shadow:0 10px 25px rgba(0,0,0,0.6);
+}
+
+.chat-messages{
+height:200px;
+overflow-y:auto;
+background:#000;
+padding:10px;
+margin-bottom:10px;
+font-size:14px;
+}
 </style>
 </head>
 
@@ -251,24 +287,10 @@ interior design and paints.
 
 <footer>
 <p>© 2026 DEY CHOUDHURY CONSTRUCTION VENTURES (DCCV)</p>
-<p><a href="admin.html" style="color:#f4b400">Admin Panel</a></p>
+<p><a href="#" onclick="openAdmin()" style="color:#f4b400">Admin Panel</a></p>
 </footer>
 
 <a class="whatsapp" href="https://wa.me/918402933354">WhatsApp</a>
-<a class="youtube" href="https://youtube.com/@dc-construction-ventures?si=qLpOPZ3sOTamHZX2" target="_blank">▶</a>
-
-<!-- ONLY ICONS CHANGED -->
-<a class="instagram" href="https://www.instagram.com/dc_construction_ventures?igsh=anA1Z2hkN2t4YnE3&utm_source=ig_contact_invite" target="_blank">
-<svg width="22" height="22" viewBox="0 0 24 24" fill="white">
-<path d="M7 2C4.24 2 2 4.24 2 7v10c0 2.76 2.24 5 5 5h10c2.76 0 5-2.24 5-5V7c0-2.76-2.24-5-5-5H7zm10 2a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm-5 3a5 5 0 1 1 0 10 5 5 0 0 1 0-10z"/>
-</svg>
-</a>
-
-<a class="facebook" href="https://www.facebook.com/share/17AqacGcEx/" target="_blank">
-<svg width="22" height="22" viewBox="0 0 24 24" fill="white">
-<path d="M22 12a10 10 0 1 0-11.5 9.95v-7.05H8v-2.9h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.7-1.6 1.4v1.7H18l-.4 2.9h-2.5V22A10 10 0 0 0 22 12z"/>
-</svg>
-</a>
 
 <!-- CHATBOT -->
 <div class="chatbot-btn" onclick="toggleChat()">💬</div>
@@ -325,6 +347,38 @@ function sendMessage() {
 
   input.value = "";
   chat.scrollTop = chat.scrollHeight;
+}
+
+/* ✅ LOGIN SYSTEM */
+function openAuth(){
+  let pass = prompt("Enter Admin Password:");
+  if(pass === "dccv123"){
+    localStorage.setItem("dccv_admin","true");
+    alert("Login successful");
+    document.getElementById("logoutBtn").style.display = "inline-block";
+  } else {
+    alert("Wrong password");
+  }
+}
+
+function logoutUser(){
+  localStorage.removeItem("dccv_admin");
+  alert("Logged out");
+  document.getElementById("logoutBtn").style.display = "none";
+}
+
+/* ✅ ADMIN PROTECTION */
+function openAdmin(){
+  if(localStorage.getItem("dccv_admin") === "true"){
+    window.location.href = "admin.html";
+  } else {
+    alert("Please login first");
+  }
+}
+
+/* auto UI check */
+if(localStorage.getItem("dccv_admin") === "true"){
+  document.getElementById("logoutBtn").style.display = "inline-block";
 }
 </script>
 
