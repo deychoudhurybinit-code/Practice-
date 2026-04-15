@@ -156,12 +156,6 @@ text-decoration:none;
 font-weight:bold;
 }
 
-/* make svg icons white */
-.instagram img,
-.facebook img{
-filter:invert(1);
-}
-
 /* CHATBOT */
 .chatbot-btn{
 position:fixed;
@@ -311,13 +305,8 @@ interior design and paints.
 <a class="whatsapp" href="https://wa.me/918402933354">WhatsApp</a>
 <a class="youtube" href="https://youtube.com/@dc-construction-ventures?si=qLpOPZ3sOTamHZX2" target="_blank">▶</a>
 
-<a class="instagram" href="https://www.instagram.com/dc_construction_ventures?igsh=anA1Z2hkN2t4YnE3&utm_source=ig_contact_invite" target="_blank">
-<img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/instagram.svg" width="22">
-</a>
-
-<a class="facebook" href="https://www.facebook.com/share/17AqacGcEx/" target="_blank">
-<img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/facebook.svg" width="22">
-</a>
+<a class="instagram" href="https://www.instagram.com/dc_construction_ventures?igsh=anA1Z2hkN2t4YnE3&utm_source=ig_contact_invite" target="_blank">📸</a>
+<a class="facebook" href="https://www.facebook.com/share/17AqacGcEx/" target="_blank">f</a>
 
 <!-- CHATBOT -->
 <div class="chatbot-btn" onclick="toggleChat()">💬</div>
@@ -331,57 +320,70 @@ interior design and paints.
 <button onclick="sendMessage()">Send</button>
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-
 <script>
-// KEEPING YOUR ORIGINAL LOGIC + ADDING CHATBOT UPGRADE ONLY
+let step = 0;
+let lead = { name: "", phone: "", requirement: "" };
 
-let step=0;
-let lead={name:"",phone:"",requirement:""};
-
-function toggleChat(){
-let box=document.getElementById("chatbox");
-box.style.display=box.style.display==="block"?"none":"block";
+function toggleChat() {
+  let box = document.getElementById("chatbox");
+  box.style.display = box.style.display === "block" ? "none" : "block";
 }
 
-function sendMessage(){
-let input=document.getElementById("userInput");
-let msg=input.value.trim();
-if(!msg) return;
+function sendMessage() {
+  let input = document.getElementById("userInput");
+  let msg = input.value.trim();
+  if (!msg) return;
 
-let chat=document.getElementById("chatMessages");
-chat.innerHTML+=`<p><b>You:</b> ${msg}</p>`;
+  let chat = document.getElementById("chatMessages");
 
-if(step===0){
-lead.name=msg;
-chat.innerHTML+=`<p><b>Bot:</b> Nice to meet you ${lead.name}! 📛 Enter your phone number.</p>`;
-step=1;
-}
-else if(step===1){
-lead.phone=msg;
-chat.innerHTML+=`<p><b>Bot:</b> What service do you need?</p>`;
-step=2;
-}
-else{
-lead.requirement=msg;
-chat.innerHTML+=`<p><b>Bot:</b> Thanks! We will contact you shortly 🚀</p>`;
+  chat.innerHTML += `<p><b>You:</b> ${msg}</p>`;
 
-let fullMsg=`DCCV NEW LEAD 🚨
+  let lowerMsg = msg.toLowerCase();
 
-Name: ${lead.name}
-Phone: ${lead.phone}
-Requirement: ${lead.requirement}`;
+  let smartReply = "";
 
-window.open("https://wa.me/918402933354?text="+encodeURIComponent(fullMsg));
+  if (lowerMsg.includes("price") || lowerMsg.includes("cost")) {
+    smartReply = "📊 Price depends on project size. Please share area (sq ft).";
+  } 
+  else if (lowerMsg.includes("house") || lowerMsg.includes("home")) {
+    smartReply = "🏠 We build full houses from foundation to finish. What's your area?";
+  } 
+  else if (lowerMsg.includes("contact") || lowerMsg.includes("phone")) {
+    smartReply = "📞 Please share your phone number so our team can call you.";
+  } 
+  else if (lowerMsg.includes("location")) {
+    smartReply = "📍 We are based in Silchar, Assam. We serve all nearby areas.";
+  }
 
-step=0;
-lead={name:"",phone:"",requirement:""};
-}
+  if (step === 0) {
+    lead.name = msg;
+    chat.innerHTML += `<p><b>Bot:</b> Nice to meet you ${lead.name} 👋 Now share your phone number.</p>`;
+    step = 1;
+  } 
+  else if (step === 1) {
+    lead.phone = msg;
+    chat.innerHTML += `<p><b>Bot:</b> What service do you need?</p>`;
+    step = 2;
+  } 
+  else if (step === 2) {
+    lead.requirement = msg;
 
-input.value="";
-chat.scrollTop=chat.scrollHeight;
+    chat.innerHTML += `<p><b>Bot:</b> धन्यवाद 🙏 Our team will contact you soon!</p>`;
+
+    let fullMsg = `DCCV CHAT LEAD 🚨\n\nName: ${lead.name}\nPhone: ${lead.phone}\nRequirement: ${lead.requirement}`;
+
+    window.open("https://wa.me/918402933354?text=" + encodeURIComponent(fullMsg));
+
+    step = 0;
+    lead = { name: "", phone: "", requirement: "" };
+  }
+
+  if (smartReply !== "" && step > 0) {
+    chat.innerHTML += `<p><b>Bot:</b> ${smartReply}</p>`;
+  }
+
+  input.value = "";
+  chat.scrollTop = chat.scrollHeight;
 }
 </script>
 
